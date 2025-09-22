@@ -1,0 +1,27 @@
+# Build output
+bin/
+obj/
+
+# Visual Studio Code settings
+.vscode/
+
+# Visual Studio folder
+.vs/
+
+# User-specific files
+*.user
+*.suo
+
+# Debugging
+*.pdb
+*.cache
+*.log
+
+# NuGet
+*.nupkg
+*.snupkg
+project.assets.json
+project.nuget.cache
+
+# Others
+*.tmp
