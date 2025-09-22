@@ -1,5 +1,19 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,737;1,14..32,737&display=swap');
+
+:root {
+    --color-primary: #00FF90;
+    --color-primary-light: #E3FFF1;
+    --color-primary-lighter: #F4FFF8;
+    --color-shadow: #F1F7F4;
+    --color-light: #FFFFFF;
+    --color-dark: #00554E;
+    --color-bg: #FFFFFF;
+    --font-main: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
 html, body {
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-family: 'Inter', sans-serif;
+    color: var(--color-dark);
 }
 
 a, .btn-link {
@@ -58,3 +72,41 @@ h1:focus {
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
     text-align: start;
 }
+
+.navbar-icon {
+    font-family: 'Material Symbols Outlined';
+    font-weight: normal;
+    font-style: normal;
+    display: inline-block;
+
+    font-variation-settings:
+        'FILL' 0,
+        'wght' 400,
+        'GRAD' 0,
+        'opsz' 40;
+
+    vertical-align: middle;
+    margin-right: 0.5rem;
+    font-size: 1.75rem;
+    color: var(--color-primary);
+}
+
+.navbar-brand-icon {
+    font-family: 'Material Symbols Outlined';
+    font-weight: normal;
+    font-style: normal;
+    display: inline-block;
+
+    font-variation-settings:
+        'FILL' 0,
+        'wght' 400,
+        'GRAD' 0,
+        'opsz' 40;
+
+    vertical-align: middle;
+    margin-right: 0.25rem;
+    font-size: 2rem;
+    color: var(--color-primary);
+    padding-bottom: 5px;
+}
+

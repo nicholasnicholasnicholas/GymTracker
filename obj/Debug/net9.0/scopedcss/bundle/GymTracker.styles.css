@@ -1,4 +1,105 @@
-.navbar-toggler {
+/* _content/GymTracker/Components/Layout/MainLayout.razor.rz.scp.css */
+.page[b-efbo7hkvql] {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+main[b-efbo7hkvql] {
+    background-color: var(--color-primary-lighter);
+    flex: 1;
+}
+
+.sidebar[b-efbo7hkvql] {
+    background-color: #FFFFFF
+}
+
+.top-row[b-efbo7hkvql] {
+    background-image: linear-gradient(90deg, var(--color-shadow) 0%, var(--color-light) 50%);
+    justify-content: flex-end;
+    height: 6rem;
+    display: flex;
+    align-items: center;
+}
+
+    .top-row[b-efbo7hkvql]  a, .top-row[b-efbo7hkvql]  .btn-link {
+        white-space: nowrap;
+        margin-left: 1.5rem;
+        text-decoration: none;
+    }
+
+    .top-row[b-efbo7hkvql]  a:hover, .top-row[b-efbo7hkvql]  .btn-link:hover {
+        text-decoration: underline;
+    }
+
+    .top-row[b-efbo7hkvql]  a:first-child {
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+@media (max-width: 640.98px) {
+    .top-row[b-efbo7hkvql] {
+        justify-content: space-between;
+    }
+
+    .top-row[b-efbo7hkvql]  a, .top-row[b-efbo7hkvql]  .btn-link {
+        margin-left: 0;
+    }
+}
+
+@media (min-width: 641px) {
+    .page[b-efbo7hkvql] {
+        flex-direction: row;
+    }
+
+    .sidebar[b-efbo7hkvql] {
+        width: 250px;
+        height: 100vh;
+        position: sticky;
+        top: 0;
+    }
+
+    .top-row[b-efbo7hkvql] {
+        position: sticky;
+        top: 0;
+        z-index: 1;
+    }
+
+    .top-row.auth[b-efbo7hkvql]  a:first-child {
+        flex: 1;
+        text-align: right;
+        width: 0;
+    }
+
+    .top-row[b-efbo7hkvql], article[b-efbo7hkvql] {
+        padding-top: 2.5rem !important;
+        padding-left: 3rem !important;
+        padding-right: 1.5rem !important;
+    }
+}
+
+#blazor-error-ui[b-efbo7hkvql] {
+    color-scheme: light only;
+    background: lightyellow;
+    bottom: 0;
+    box-shadow: 0 -1px 2px rgba(0, 0, 0, 0.2);
+    box-sizing: border-box;
+    display: none;
+    left: 0;
+    padding: 0.6rem 1.25rem 0.7rem 1.25rem;
+    position: fixed;
+    width: 100%;
+    z-index: 1000;
+}
+
+    #blazor-error-ui .dismiss[b-efbo7hkvql] {
+        cursor: pointer;
+        position: absolute;
+        right: 0.75rem;
+        top: 0.5rem;
+    }
+/* _content/GymTracker/Components/Layout/NavMenu.razor.rz.scp.css */
+.navbar-toggler[b-saodrixeht] {
     appearance: none;
     cursor: pointer;
     width: 3.5rem;
@@ -11,16 +112,16 @@
     background: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 0.55%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") no-repeat center/1.75rem rgba(255, 255, 255, 0.1);
 }
 
-.navbar-toggler:checked {
+.navbar-toggler:checked[b-saodrixeht] {
     background-color: rgba(255, 255, 255, 0.5);
 }
 
-.top-row {
+.top-row[b-saodrixeht] {
     min-height: 5.5rem;
     /*background-color: rgba(0, 0, 0, 0.4);*/
 }
 
-.navbar-brand {
+.navbar-brand[b-saodrixeht] {
     font-size: 1.25rem;
     font-weight: 900;
     color: var(--color-dark);
@@ -28,7 +129,7 @@
     padding-left: .5rem;
 }
 
-.bi {
+.bi[b-saodrixeht] {
     display: inline-block;
     position: relative;
     width: 1.5rem;
@@ -54,20 +155,20 @@
 }
 */
 
-.nav-item {
+.nav-item[b-saodrixeht] {
     font-size: 1rem;
     padding-bottom: 1px;
 }
 
-    .nav-item:first-of-type {
+    .nav-item:first-of-type[b-saodrixeht] {
         padding-top: 2rem;
     }
 
-    .nav-item:last-of-type {
+    .nav-item:last-of-type[b-saodrixeht] {
         padding-bottom: 2rem;
     }
 
-    .nav-item ::deep .nav-link {
+    .nav-item[b-saodrixeht]  .nav-link {
         background-color: var(--color-shadow);
         color: var(--color-dark);
         border: none;
@@ -79,30 +180,30 @@
         width: 100%;
     }
 
-.nav-item ::deep a.active {
+.nav-item[b-saodrixeht]  a.active {
     background-image: linear-gradient(90deg, var(--color-primary-light) 98%, var(--color-primary) 5%);
     color: var(--color-dark);
 }
 
-.nav-item ::deep .nav-link:hover {
+.nav-item[b-saodrixeht]  .nav-link:hover {
     background-image: linear-gradient(90deg, var(--color-primary-light) 0%, var(--color-shadow) 50%);
     color: rgb(10, 10 ,10);
 }
 
-.nav-scrollable {
+.nav-scrollable[b-saodrixeht] {
     display: none;
 }
 
-.navbar-toggler:checked ~ .nav-scrollable {
+.navbar-toggler:checked ~ .nav-scrollable[b-saodrixeht] {
     display: block;
 }
 
 @media (min-width: 641px) {
-    .navbar-toggler {
+    .navbar-toggler[b-saodrixeht] {
         display: none;
     }
 
-    .nav-scrollable {
+    .nav-scrollable[b-saodrixeht] {
         /* Never collapse the sidebar for wide screens */
         display: block;
 
