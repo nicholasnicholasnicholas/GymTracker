@@ -1,21 +1,101 @@
 @page "/logworkout"
 @rendermode InteractiveServer
 
-<PageTitle>Log Workout</PageTitle>
+@using System.Timers
 
 <h1>Log Workout</h1>
 
-<!--
-<p role="status">Current count: @currentCount</p>
+<!-- Date and Workout Stopwatch containers -->
+<div class="container-fluid container-white px-0 rounded">
+    <div class=" d-flex flex-wrap gap-3">
+        <!-- Date -->
+        <div class="p-3 flex-fill" style="min-width: 150px;">
+            <label class="form-label mb-"><strong>Date</strong></label>
+            <input class="form-control container-date" type="date" @bind="workoutDate" />
+        </div>
 
-<button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
+        <!-- Workout Stopwatch -->
+        <div class="p-3 flex-fill" style="min-width: 150px;">
+            <label class="form-label mb-1"><strong>Stopwatch</strong></label>
+
+            <div class="d-flex gap-2 mb-1">
+                <button class="@buttonType flex-fill d-flex justify-content-between align-items-center px-3" @onclick="ToggleWorkout">
+                    <div class="d-flex align-items-center gap-2">
+                        <span>@(isWorkoutActive ? "⏹" : "▶")</span>
+                        <strong>@buttonText</strong>
+                    </div>
+                    <span class="ms-3">@formattedDuration</span>
+                </button>
+
+                <button class="btn button-success" @onclick="ResetWorkout" disabled="@isWorkoutActive">
+                    ↺
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Workout Stopwatch -->
 
 @code {
-    private int currentCount = 0;
+    private DateTime workoutDate = DateTime.Today;
+}
 
-    private void IncrementCount()
+
+@code {
+    private string buttonText => isWorkoutActive ? "Stop" : "Start";
+    private string buttonType => isWorkoutActive ? "btn button-danger" : "btn button-success";
+
+    private bool isWorkoutActive = false;
+
+    private TimeSpan workoutDuration = TimeSpan.Zero; // Accumulated time
+    private string formattedDuration => DisplayDuration.ToString(@"hh\:mm\:ss");
+
+    private Timer? workoutTimer;
+    private DateTime lastStartTime;
+
+    private TimeSpan DisplayDuration =>
+        isWorkoutActive
+            ? workoutDuration + (DateTime.Now - lastStartTime) // running
+            : workoutDuration; // paused
+
+    private void ToggleWorkout()
     {
-        currentCount++;
+        if (!isWorkoutActive)
+        {
+            // Resume workout
+            isWorkoutActive = true;
+            lastStartTime = DateTime.Now;
+
+            workoutTimer = new Timer(1000);
+            workoutTimer.Elapsed += UpdateWorkoutDuration;
+            workoutTimer.AutoReset = true;
+            workoutTimer.Start();
+        }
+        else
+        {
+            // Pause workout
+            isWorkoutActive = false;
+
+            // Add the time since last resume
+            workoutDuration += DateTime.Now - lastStartTime;
+
+            workoutTimer?.Stop();
+            workoutTimer?.Dispose();
+        }
+    }
+
+    private void UpdateWorkoutDuration(object? sender, ElapsedEventArgs e)
+    {
+        InvokeAsync(StateHasChanged); // Just refresh UI
+    }
+
+    private void ResetWorkout()
+    {
+        if (isWorkoutActive)
+            return;
+
+        workoutDuration = TimeSpan.Zero;
     }
 }
--->
+
