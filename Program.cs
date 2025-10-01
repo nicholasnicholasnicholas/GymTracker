@@ -12,12 +12,14 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
 
+
 //  Register EF core with a SQLite database
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Add user service for data operations
 builder.Services.AddScoped<UserService>();
+
 
 
 var app = builder.Build();

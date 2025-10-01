@@ -11,6 +11,34 @@
     --font-main: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 }
 
+.color-primary {
+    color: var(--color-primary);
+}
+
+.color-primary-light {
+    color: var(--color-primary-light);
+}
+
+.color-primary-lighter {
+    color: var(--color-primary-lighter);
+}
+
+.color-shadow {
+    color: var(--color-shadow);
+}
+
+.color-light {
+    color: var(--color-light);
+}
+
+.color-dark {
+    color: var(--color-dark);
+}
+
+.color-bg {
+    color: var(--color-bg);
+}
+
 html, body {
     font-family: 'Inter', sans-serif;
     color: var(--color-dark);
@@ -110,3 +138,26 @@ h1:focus {
     padding-bottom: 5px;
 }
 
+.container-white {
+    background-color: var(--color-light);
+}
+
+.container-light {
+    background-color: var(--color-shadow);
+}
+
+.container-date {
+    background-color: var(--color-primary-light);
+    color: var(--color-dark);
+    border: none
+}
+
+.button-success {
+    background-color: var(--color-primary-light);
+    color: var(--color-dark);
+}
+
+.button-danger {
+    background-color: var(--color-dark);
+    color: var(--color-primary);
+}
