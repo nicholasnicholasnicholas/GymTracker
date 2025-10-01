@@ -1,10 +1,16 @@
+/*
+*   This class represents the database context for the application.
+*   It inherits from DbContext and provides access to the database.
+*/
+
+
 using Microsoft.EntityFrameworkCore;
 using GymTracker.Models;
 
 namespace GymTracker.Data;
-    public class AppDbContext : DbContext
+    public class ApplicationDbContext : DbContext
     {
-        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
         }
         public DbSet<User> Users { get; set; }
