@@ -46,14 +46,12 @@
 
 <!-- Code - Stopwatch -->
 @code {
-    private string buttonText => isWorkoutActive ? "Stop" : "Start";
+     private string buttonText => isWorkoutActive ? "Stop" : "Start";
     private string buttonType => isWorkoutActive ? "btn button-danger" : "btn button-success";
 
     private bool isWorkoutActive = false;
 
-    private TimeSpan workoutDuration =  TimeSpan.Zero; // Accumulated time
-    private string formattedDuration =   DisplayDuration.ToString(@"hh\:mm\:ss");
-
+    private TimeSpan workoutDuration = TimeSpan.Zero; // Accumulated time
     private Timer? workoutTimer;
     private DateTime lastStartTime;
 
@@ -61,6 +59,8 @@
         isWorkoutActive
             ? workoutDuration + (DateTime.Now - lastStartTime) // running
             : workoutDuration; // paused
+
+    private string formattedDuration => DisplayDuration.ToString(@"hh\:mm\:ss");
 
     private void ToggleWorkout()
     {
