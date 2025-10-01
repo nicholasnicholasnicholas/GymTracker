@@ -3,24 +3,28 @@
 
 @using System.Timers
 
-<h1>Log Workout</h1>
+@using GymTracker.ViewModels
+@using GymTracker.Models
+@using GymTracker.Data
+
+<h1 class="mb-4">Log Workout</h1>
 
 <!-- Date and Workout Stopwatch containers -->
 <div class="container-fluid container-white px-0 rounded">
     <div class=" d-flex flex-wrap gap-3">
         <!-- Date -->
         <div class="p-3 flex-fill" style="min-width: 150px;">
-            <label class="form-label mb-"><strong>Date</strong></label>
-            <input class="form-control container-date" type="date" @bind="workoutDate" />
+            <label class="form-label fs-4"><strong>Date</strong></label>
+            <input class="form-control fs-5 container-date" type="date" @bind="workoutDate" />
         </div>
 
         <!-- Workout Stopwatch -->
         <div class="p-3 flex-fill" style="min-width: 150px;">
-            <label class="form-label mb-1"><strong>Stopwatch</strong></label>
+            <label class="form-label fs-4"><strong>Stopwatch</strong></label>
 
             <div class="d-flex gap-2 mb-1">
-                <button class="@buttonType flex-fill d-flex justify-content-between align-items-center px-3" @onclick="ToggleWorkout">
-                    <div class="d-flex align-items-center gap-2">
+                <button class="@buttonType flex-fill d-flex justify-content-between align-items-center fs-5" @onclick="ToggleWorkout">
+                    <div class="d-flex align-items-center gap-2 fs-5">
                         <span>@(isWorkoutActive ? "⏹" : "▶")</span>
                         <strong>@buttonText</strong>
                     </div>
@@ -35,21 +39,20 @@
     </div>
 </div>
 
-<!-- Workout Stopwatch -->
-
+<!-- Code - Date -->
 @code {
     private DateTime workoutDate = DateTime.Today;
 }
 
-
+<!-- Code - Stopwatch -->
 @code {
     private string buttonText => isWorkoutActive ? "Stop" : "Start";
     private string buttonType => isWorkoutActive ? "btn button-danger" : "btn button-success";
 
     private bool isWorkoutActive = false;
 
-    private TimeSpan workoutDuration = TimeSpan.Zero; // Accumulated time
-    private string formattedDuration => DisplayDuration.ToString(@"hh\:mm\:ss");
+    private TimeSpan workoutDuration =  TimeSpan.Zero; // Accumulated time
+    private string formattedDuration =   DisplayDuration.ToString(@"hh\:mm\:ss");
 
     private Timer? workoutTimer;
     private DateTime lastStartTime;
@@ -99,3 +102,98 @@
     }
 }
 
+<!-- Journal -->
+<div class="container-fluid container-white px-3 py-3 mt-3 rounded">
+    <label class="form-label fs-4"><strong>Journal</strong></label>
+    @foreach (var exercise in exercises)
+    {
+        <div class="card mb-3">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <strong>@exercise.Name</strong>
+                <button class="btn btn-sm btn-outline-secondary" @onclick="() => ToggleExercise(exercise)">
+                    @(exercise.IsExpanded ? "Hide" : "Show")
+                </button>
+            </div>
+
+            @if (exercise.IsExpanded)
+            {
+                <div class="card-body">
+                    @foreach (var set in exercise.Sets)
+                    {
+                        <div class="d-flex gap-2 mb-2">
+                            <input type="number" class="form-control" placeholder="Weight (lbs)" @bind="set.Weight" />
+                            <input type="number" class="form-control" placeholder="Reps" @bind="set.Reps" />
+                        </div>
+                    }
+
+                    <button class="btn btn-sm btn-outline-success" @onclick="() => AddSet(exercise)">+ Add Set</button>
+                </div>
+            }
+        </div>
+    }
+
+    <!-- Populate exercise list -->
+    <div class="d-flex gap-2 mb-2">
+        <select class="form-select" @bind="newExerciseName">
+            <option value="">-- Select --</option>
+            @foreach (Exercise exercise in Exercises)
+            {
+                <option value="@exercise.Name">@exercise.Name</option>
+            }
+        </select>
+        <button class="btn btn-primary" @onclick="AddExercise" disabled="@string.IsNullOrWhiteSpace(newExerciseName)">+ Add</button>
+    </div>
+</div>
+
+@code {
+    private List<Exercise> Exercises = new();
+    private string? newExerciseName;
+
+    protected override void OnInitialized()
+    {
+        // Load all seeded exercises from DB
+    }
+
+    private List<ExerciseEntry> exercises = new();
+
+   private void AddExercise()
+    {
+        if (string.IsNullOrWhiteSpace(newExerciseName))
+            return;
+
+        // Do something with the selected exercise
+        var selected = Exercises.FirstOrDefault(e => e.Name == newExerciseName);
+
+        if (selected != null)
+        {
+            // Example: Add it to a workout, or just test with console
+            Console.WriteLine($"Added: {selected.Name}");
+        }
+
+        newExerciseName = string.Empty;
+    }
+
+    private void AddSet(ExerciseEntry exercise)
+    {
+        exercise.Sets.Add(new SetEntry());
+    }
+
+    private void ToggleExercise(ExerciseEntry exercise)
+    {
+        exercise.IsExpanded = !exercise.IsExpanded;
+    }
+
+    // Local-only inline classes
+    private class ExerciseEntry
+    {
+        public string Name { get; set; } = string.Empty;
+        public bool IsExpanded { get; set; } = true;
+        public List<SetEntry> Sets { get; set; } = new();
+    }
+
+    private class SetEntry
+    {
+        public double Weight { get; set; }
+        public int Reps { get; set; }
+    }
+}

@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
 using GymTracker.Data;
 using Microsoft.EntityFrameworkCore;
 
-
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
