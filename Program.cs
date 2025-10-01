@@ -2,7 +2,6 @@ using GymTracker.Components;
 using Microsoft.EntityFrameworkCore;
 using GymTracker.Data;
 
-
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
