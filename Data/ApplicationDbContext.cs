@@ -6,12 +6,12 @@ namespace GymTracker.Data
     public class ApplicationDbContext : DbContext
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
-            : base(options) {}
-
+            : base(options) { }
+        public DbSet<User> Users { get; set; }
         public DbSet<Exercise> Exercises { get; set; }
         public DbSet<Muscle> Muscles { get; set; }
         public DbSet<ExerciseMuscle> ExerciseMuscles { get; set; }
-        
+
         public DbSet<WorkoutSession> WorkoutSessions { get; set; }
         public DbSet<WorkoutEntry> WorkoutEntries { get; set; }
         public DbSet<WorkoutSet> WorkoutSets { get; set; }
@@ -45,3 +45,23 @@ namespace GymTracker.Data
         }
     }
 }
+
+
+
+
+
+/*
+*   This class represents the database context for the application.
+*   It inherits from DbContext and provides access to the database.
+using Microsoft.EntityFrameworkCore;
+using GymTracker.Models;
+
+namespace GymTracker.Data;
+    public class ApplicationDbContext : DbContext
+    {
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
+        {
+        }
+        public DbSet<User> Users { get; set; }
+    }
+*/
