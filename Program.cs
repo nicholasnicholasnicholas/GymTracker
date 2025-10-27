@@ -3,14 +3,13 @@ using GymTracker.Services;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
 using GymTracker.Data;
 using Microsoft.EntityFrameworkCore;
+using Blazored.LocalStorage;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
-
-
 
 //  Register EF core with a SQLite database
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -19,7 +18,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 // Add user service for data operations
 builder.Services.AddScoped<UserService>();
 
-
+// Add local storage
+builder.Services.AddBlazoredLocalStorage();
 
 var app = builder.Build();
 
