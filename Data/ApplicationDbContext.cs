@@ -9,6 +9,11 @@ namespace GymTracker.Data
             : base(options) { }
         public DbSet<User> Users { get; set; }
 
+        public DbSet<WorkoutSession> WorkoutSessions { get; set; }
+        public DbSet<WorkoutEntry> WorkoutEntries { get; set; }
+        public DbSet<Set> Sets { get; set; }
+        public DbSet<Exercise> Exercises { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
