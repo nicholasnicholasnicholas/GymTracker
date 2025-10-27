@@ -33,9 +33,13 @@ project.nuget.cache
 *.db-shm
 *.db-wal
 *.db-journal
+*.db
+*.db-GymTracker
 
 # Build artifacts
 bin/
 obj/
+
+
 
 
