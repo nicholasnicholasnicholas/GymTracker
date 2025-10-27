@@ -1,0 +1,227 @@
+@page "/nearest-gym"
+@inject IJSRuntime JS
+@rendermode InteractiveServer
+
+<h3>📍 Nearest Gym </h3>
+
+<button id="blazorGetLocationBtn" class="btn btn-primary" @onclick="GetLocation" disabled="@isLoading">
+    @if (isLoading)
+    {
+        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+    <span class="sr-only"> Loading...</span>
+    <span>&nbsp;Detecting...</span>
+    }
+    else
+    {
+        <span>Get My Location</span>
+    }
+</button>
+
+<!-- locationMessage display removed -->
+<!-- debugInfo removed -->
+
+@if (nearestGyms?.Any() == true)
+{
+    <h5 class="mt-3">Nearby gyms</h5>
+    <ul class="list-group">
+        @foreach (var g in nearestGyms)
+        {
+            <li class="list-group-item d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="fw-bold">@g.Name</div>
+                    <div class="text-muted small">@g.Address</div>
+                </div>
+                <span class="badge bg-primary rounded-pill">@String.Format("{0:0.0} mi", g.DistanceMiles)</span>
+            </li>
+        }
+    </ul>
+}
+else if (!string.IsNullOrEmpty(locationMessage) && !isLoading)
+{
+    <div class="mt-3 text-muted">No nearby gyms found. Click the button to detect your location.</div>
+}
+
+<!-- Fallback: attach a DOM click handler in case Blazor event wiring isn't active -->
+<script>
+    (function () {
+        try {
+            const btn = document.getElementById('blazorGetLocationBtn');
+            const msgEl = document.getElementById('blazorLocationMessage');
+            if (!btn) return;
+
+            btn.addEventListener('click', function (e) {
+                // If Blazor handled it, this will be harmless; otherwise this gives a fallback
+                try {
+                    if (msgEl) msgEl.textContent = 'Fallback: detecting location...';
+                    window.getUserLocation().then(p => {
+                        if (msgEl) msgEl.textContent = `Lat: ${p.Latitude}, Lng: ${p.Longitude}`;
+                        console.log('Fallback: got position', p);
+
+                        // If map helper is present, add a user marker and pan to it
+                        try {
+                            if (window.geolocationMap && typeof window.geolocationMap.addUserMarker === 'function') {
+                                window.geolocationMap.addUserMarker('nearestGymMap', p.Latitude, p.Longitude, { pan: true });
+                            }
+                        } catch (mapErr) {
+                            console.error('Fallback map update error', mapErr);
+                        }
+
+                    }).catch(err => {
+                        if (msgEl) msgEl.textContent = 'Fallback error: ' + err;
+                        console.error('Fallback error', err);
+                    });
+                }
+                catch (err) {
+                    console.error('Fallback click handler error', err);
+                }
+            });
+        }
+        catch (err) {
+            console.error('Error installing fallback click handler', err);
+        }
+    })();
+</script>
+
+<div class="mt-3">
+    <div id="nearestGymMap" style="height: 400px; width: 100%; border: 1px solid #ddd; border-radius:4px;"></div>
+</div>
+
+@code {
+    private string? locationMessage = string.Empty;
+    // debugInfo removed
+    private bool isLoading = false;
+    private bool isSearching = false;
+
+    private async Task GetLocation()
+    {
+        // Immediate feedback so we know the Blazor click handler fired
+        isLoading = true;
+        locationMessage = "Blazor handler invoked...";
+        await JS.InvokeVoidAsync("console.log", "Blazor: GetLocation handler invoked");
+        StateHasChanged();
+
+        try
+        {
+            // Call the global function exposed in wwwroot/geolocation.js
+            // First call it as raw object to log the result for debugging
+            var raw = await JS.InvokeAsync<object>("getUserLocation");
+            await JS.InvokeVoidAsync("console.log", "Blazor: raw result", raw);
+
+            // Then map to the typed object
+            var pos = await JS.InvokeAsync<Geolocation>("getUserLocation");
+            locationMessage = $"Lat: {pos.Latitude}, Lng: {pos.Longitude}";
+
+            // Compute nearest gyms from this position
+            await ComputeNearestGymsAsync(pos.Latitude, pos.Longitude);
+
+            // Add a user marker and re-center the map if the helper is available
+            try
+            {
+                // Pass color options to match app theme and request a bounce
+                await JS.InvokeVoidAsync("geolocationMap.addUserMarker", "nearestGymMap", pos.Latitude, pos.Longitude, new { pan = true, zoom = 13, popup = "You are here", color = "var(--color-primary)", ringColor = "var(--color-primary-light)" });
+            }
+            catch (JSException) { /* ignore if map helper is not present */ }
+        }
+        catch (JSException jsex)
+        {
+            locationMessage = "JS error: " + jsex.Message + "\n" + jsex.StackTrace;
+            await JS.InvokeVoidAsync("console.error", "Blazor JSException:", jsex.Message, jsex.StackTrace);
+        }
+        catch (Exception ex)
+        {
+            locationMessage = "Error: " + ex.Message + "\n" + ex.StackTrace;
+            await JS.InvokeVoidAsync("console.error", "Blazor Exception:", ex.Message, ex.StackTrace);
+        }
+        finally
+        {
+            isLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    public class Geolocation
+    {
+        public double Latitude { get; set; }
+        public double Longitude { get; set; }
+    }
+
+    // Simple in-memory gym dataset. Replace with API call or database as needed.
+    private readonly List<Gym> gyms = new()
+    {
+        // Fullerton area sample gyms (approximate coordinates)
+        new Gym("Fullerton Community Gym", 33.8703, -117.9243, "Downtown Fullerton"),
+        new Gym("24 Hour Fitness Fullerton", 33.8866, -117.8883, "1801 E Chapman Ave"),
+        new Gym("Planet Fitness Fullerton", 33.8742, -117.9161, "123 Euclid St"),
+        new Gym("LA Fitness - Fullerton", 33.8776, -117.9190, "500 N Harbor Blvd"),
+        new Gym("Downtown YMCA Fullerton", 33.8697, -117.9190, "201 W Commonwealth Ave")
+    };
+
+    private List<NearestGymResult> nearestGyms = new();
+
+    private async Task ComputeNearestGymsAsync(double userLat, double userLng)
+    {
+        isSearching = true;
+        StateHasChanged();
+
+        await Task.Yield(); // allow UI to update
+
+            nearestGyms = gyms
+            .Select(g => new NearestGymResult
+            {
+                Name = g.Name,
+                Address = g.Address,
+                DistanceMiles = HaversineDistanceMiles(userLat, userLng, g.Latitude, g.Longitude)
+            })
+            .OrderBy(r => r.DistanceMiles)
+            .ToList();
+
+        isSearching = false;
+        StateHasChanged();
+    }
+
+    private static double HaversineDistanceMiles(double lat1, double lon1, double lat2, double lon2)
+    {
+        // Compute distance in kilometers then convert to miles
+        double R = 6371; // Earth radius in km
+        double dLat = ToRadians(lat2 - lat1);
+        double dLon = ToRadians(lon2 - lon1);
+        double a = Math.Sin(dLat / 2) * Math.Sin(dLat / 2) +
+                   Math.Cos(ToRadians(lat1)) * Math.Cos(ToRadians(lat2)) *
+                   Math.Sin(dLon / 2) * Math.Sin(dLon / 2);
+        double c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
+        double km = R * c;
+        return km * 0.621371; // convert km to miles
+    }
+
+    private static double ToRadians(double angle) => (Math.PI / 180) * angle;
+
+    private record Gym(string Name, double Latitude, double Longitude, string Address);
+
+    private class NearestGymResult
+    {
+        public string Name { get; set; } = string.Empty;
+        public string Address { get; set; } = string.Empty;
+        public double DistanceMiles { get; set; }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            // Center map on Fullerton, CA (approx)
+            var fullertonLat = 33.8703;
+            var fullertonLng = -117.9243;
+            try
+            {
+                await JS.InvokeVoidAsync("geolocationMap.initMap", "nearestGymMap", fullertonLat, fullertonLng, 13);
+
+                // Add initial markers from our gyms list
+                var markers = gyms.Select(g => new { name = g.Name, address = g.Address, latitude = g.Latitude, longitude = g.Longitude }).ToArray();
+                await JS.InvokeVoidAsync("geolocationMap.addMarkers", "nearestGymMap", markers);
+            }
+            catch (JSException) { /* ignore if map script not available */ }
+        }
+    }
+
+    // Keep the fallback click handler, but don't show availability checks on render
+}

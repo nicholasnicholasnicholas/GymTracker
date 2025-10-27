@@ -26,10 +26,13 @@ project.nuget.cache
 # Others
 *.tmp
 
-# OS
+# OS-specific files
 .DS_Store
 
-# SQLite junk
+# SQLite files (ignore DB and journaling)
+*.db
+*.sqlite
+*.sqlite3
 *.db-shm
 *.db-wal
 *.db-journal
@@ -41,5 +44,5 @@ bin/
 obj/
 
 
-
-
+# Build artifacts (redundant entries removed)
+# bin/ and obj/ already declared above — no need to repeat
