@@ -1,42 +1,72 @@
 @page "/login"
-@using Microsoft.AspNetCore.Components.Forms
+@layout Components.Layout.AuthLayout
+@using GymTracker.Services
+@inject UserService UserService
+@inject NavigationManager NavigationManager
 
+<div class="auth-card">
+    <h3 class="text-center">Welcome Back</h3>
+    <p class="text-center mb-4">Log in to your Gym Tracker account</p>
 
+    <EditForm FormName="LoginForm" Model="@loginModel" OnValidSubmit="HandleLogin">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
 
-<PageTitle>Login</PageTitle>
+        <div class="mb-3">
+            <label for="username" class="form-label fw-semibold">Username</label>
+            <InputText id="username" class="form-control" placeholder="Enter username" @bind-Value="loginModel.Username" />
+        </div>
 
-<h3>Login</h3>
+        <div class="mb-3">
+            <label for="password" class="form-label fw-semibold">Password</label>
+            <InputText id="password" type="password" class="form-control" placeholder="Enter password" @bind-Value="loginModel.Password" />
+        </div>
 
-<EditForm FormName= "LoginForm" Model="@loginModel" OnValidSubmit="HandleValidSubmit">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
+        <button type="submit" class="btn w-100 mt-2 login-btn">Login</button>
 
-    <div class="mb-3">
-        <label for="username" class="form-label">Username</label>
-        <InputText id="username" class="form-control" @bind-Value="loginModel.Username" />
-    </div>
-    <div class="mb-3">
-        <label for="password" class="form-label">Password</label>
-        <InputText id="password" type="password" class="form-control" @bind-Value="loginModel.Password" />
-    </div>
-    <button type="submit" class="btn btn-primary">Login</button>
-</EditForm>
+        <div class="text-center my-3 text-muted">or</div>
+
+        <!-- Google-style sign-in button -->
+        <button type="button" class="btn w-100 google-btn">
+            <img src="https://developers.google.com/identity/images/g-logo.png" alt="Google" class="google-icon" />
+            Sign in with Google
+        </button>
+
+        @if (!string.IsNullOrEmpty(message))
+        {
+            <div class="alert alert-info mt-3 text-center">@message</div>
+        }
+    </EditForm>
+
+    <p class="text-center mt-4">
+        Don’t have an account?
+        <a href="/register" class="fw-semibold">Register</a>
+    </p>
+</div>
 
 @code {
-    private LoginModel loginModel = new LoginModel();
+    private LoginModel loginModel = new();
+    private string message = "";
 
-    private void HandleValidSubmit()
+    private async Task HandleLogin()
     {
-        // Handle login logic here
-        Console.WriteLine($"Username: {loginModel.Username}, Password: {loginModel.Password}");
+        var user = await UserService.AuthenticateAsync(loginModel.Username, loginModel.Password);
+
+        if (user != null)
+        {
+            message = "✅ Login successful! Redirecting...";
+            await Task.Delay(1500);
+            NavigationManager.NavigateTo("/dashboard");
+        }
+        else
+        {
+            message = "❌ Invalid username or password.";
+        }
     }
 
     public class LoginModel
     {
-    
-        public string Username { get; set; } = string.Empty;
-
-
-        public string Password { get; set; } = string.Empty;
+        public string Username { get; set; } = "";
+        public string Password { get; set; } = "";
     }
 }

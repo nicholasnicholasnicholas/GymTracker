@@ -1,41 +1,67 @@
-<!-- Register.razor
-*   This file is for user registration-related operations
-*   such as creating a new user account.
-*   It will interact with the database
- -->
-
-
 @page "/register"
+@layout Components.Layout.AuthLayout
 @using GymTracker.Services
 @inject UserService UserService
+@inject NavigationManager NavigationManager
 
+<div class="auth-card">
+    <h3 class="text-center">Create an Account</h3>
+    <p class="text-center mb-4">Join Gym Tracker and start your fitness journey</p>
 
+    <EditForm FormName="RegisterForm" Model="@registerModel" OnValidSubmit="HandleValidSubmit">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
 
+        <div class="mb-3">
+            <label for="username" class="form-label fw-semibold">Username</label>
+            <InputText id="username" class="form-control" placeholder="Enter username" @bind-Value="registerModel.Username" />
+        </div>
 
-<h3>Register</h3>
+        <div class="mb-3">
+            <label for="password" class="form-label fw-semibold">Password</label>
+            <InputText id="password" type="password" class="form-control" placeholder="Enter password" @bind-Value="registerModel.Password" />
+        </div>
 
-<EditForm FormName="RegisterForm" Model="@registerModel" OnValidSubmit="HandleValidSubmit">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
+        <button type="submit" class="btn w-100 mt-2 register-btn">Register</button>
 
-    <div class="mb-3">
-        <label for="username" class="form-label">Username</label>
-        <InputText id="username" class="form-control" @bind-Value="registerModel.Username" />
-    </div>
-    <div class="mb-3">
-        <label for="password" class="form-label">Password</label>
-        <InputText id="password" type="password" class="form-control" @bind-Value="registerModel.Password" />
-    </div>
-    <button type="submit" class="btn btn-primary">Register</button>
-</EditForm>
+        <div class="text-center my-3 text-muted">or</div>
+
+        <!-- Google-style sign-in button -->
+        <button type="button" class="btn w-100 google-btn">
+            <img src="https://developers.google.com/identity/images/g-logo.png" alt="Google" class="google-icon" />
+            Sign up with Google
+        </button>
+
+        @if (!string.IsNullOrEmpty(message))
+        {
+            <div class="alert alert-info mt-3 text-center">@message</div>
+        }
+    </EditForm>
+
+    <p class="text-center mt-4">
+        Already have an account?
+        <a href="/login" class="fw-semibold">Login</a>
+    </p>
+</div>
 
 @code {
-    private RegisterModel registerModel = new RegisterModel();
+    private RegisterModel registerModel = new();
+    private string message = "";
 
-    private void HandleValidSubmit()
+    private async Task HandleValidSubmit()
     {
-        // Handle registration logic here
-        Console.WriteLine($"Username: {registerModel.Username}, Password: {registerModel.Password}");
+        var existingUser = await UserService.GetUserByUsernameAsync(registerModel.Username);
+
+        if (existingUser != null)
+        {
+            message = "⚠️ Username already exists. Please choose another.";
+            return;
+        }
+
+        await UserService.RegisterAsync(registerModel.Username, registerModel.Password);
+        message = "✅ Registration successful! Redirecting to login...";
+        await Task.Delay(1500);
+        NavigationManager.NavigateTo("/login");
     }
 
     public class RegisterModel
@@ -44,3 +70,4 @@
         public string Password { get; set; } = "";
     }
 }
+
