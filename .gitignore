@@ -26,3 +26,16 @@ project.nuget.cache
 # Others
 *.tmp
 
+# OS
+.DS_Store
+
+# SQLite junk
+*.db-shm
+*.db-wal
+*.db-journal
+
+# Build artifacts
+bin/
+obj/
+
+
