@@ -1,6 +1,141 @@
 @page "/newsevents"
-@rendermode InteractiveServer
 
-<PageTitle>News and Events</PageTitle>
+<h1 class="mb-4 text-center">Gym News & Events</h1>
 
-<h1>Events</h1>
+<!-- Upcoming Events Section -->
+<h3 class="mt-4 mb-3 text-success"><i class="bi bi-calendar-event"></i> Upcoming Events</h3>
+
+@if (upcomingEvents.Count == 0)
+{
+    <p class="text-muted">No upcoming events right now. Check back soon!</p>
+}
+else
+{
+    <div class="row row-cols-1 row-cols-md-2 g-4 mb-4">
+        @foreach (var e in upcomingEvents)
+        {
+            <div class="col">
+                <div class="card shadow border-0 h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <i class="bi @e.Icon text-primary me-2"></i>@e.Title
+                        </h5>
+                        <span class="badge bg-@e.CategoryColor mb-2">@e.Category</span>
+                        <p>@e.Description</p>
+                        <p class="text-muted mb-1">
+                            <i class="bi bi-calendar3"></i> @e.Date.ToString("MMMM dd, yyyy")
+                        </p>
+                        <p class="text-muted">
+                            <i class="bi bi-geo-alt"></i> @e.Location
+                        </p>
+                        <a href="@e.Link" class="btn btn-outline-primary btn-sm" target="_blank">
+                            Learn More <i class="bi bi-box-arrow-up-right"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+
+<!-- Collapsible Past Events -->
+<h3 class="mt-5 mb-3 text-secondary">
+    <button class="btn btn-link text-decoration-none" @onclick="TogglePastEvents">
+        <i class="bi @(showPastEvents ? "bi-caret-down-fill" : "bi-caret-right-fill")"></i>
+        Past Events
+    </button>
+</h3>
+
+@if (showPastEvents)
+{
+    @if (pastEvents.Count == 0)
+    {
+        <p class="text-muted">No past events yet.</p>
+    }
+    else
+    {
+        <div class="row row-cols-1 row-cols-md-2 g-4 mb-4">
+            @foreach (var e in pastEvents)
+            {
+                <div class="col">
+                    <div class="card shadow-sm border-0 h-100 bg-light">
+                        <div class="card-body">
+                            <h5 class="card-title text-muted">
+                                <i class="bi @e.Icon me-2 text-secondary"></i>@e.Title
+                            </h5>
+                            <span class="badge bg-secondary mb-2">@e.Category</span>
+                            <p class="card-text">@e.Description</p>
+                            <p class="text-muted mb-1">
+                                <i class="bi bi-calendar3"></i> @e.Date.ToString("MMMM dd, yyyy")
+                            </p>
+                            <p class="text-muted">
+                                <i class="bi bi-geo-alt"></i> @e.Location
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+}
+
+@code {
+    private bool showPastEvents = false;
+
+    private void TogglePastEvents()
+    {
+        showPastEvents = !showPastEvents;
+    }
+
+    private List<EventItem> allEvents = new()
+    {
+        new EventItem
+        {
+            Title = "Charity Marathon 2025",
+            Description = "Join our annual 5K and 10K charity run to support local youth fitness programs.",
+            Date = new DateTime(2025, 11, 12),
+            Location = "Central Park, LA",
+            Category = "Run",
+            CategoryColor = "success",
+            Icon = "bi-heart-pulse",
+            Link = "https://example.com/marathon"
+        },
+        new EventItem
+        {
+            Title = "Strength Training Workshop",
+            Description = "Learn proper lifting techniques from certified trainers in this intensive workshop.",
+            Date = new DateTime(2025, 10, 20),
+            Location = "Downtown Gym Studio",
+            Category = "Workshop",
+            CategoryColor = "warning",
+            Icon = "bi-lightning-charge",
+            Link = "https://example.com/workshop"
+        },
+        new EventItem
+        {
+            Title = "Yoga and Recovery Session",
+            Description = "Free yoga for members! Focus on flexibility, breathing, and recovery.",
+            Date = new DateTime(2025, 8, 10),
+            Location = "Main Gym Hall",
+            Category = "Wellness",
+            CategoryColor = "info",
+            Icon = "bi-peace",
+            Link = "https://example.com/yoga"
+        }
+    };
+
+    private List<EventItem> upcomingEvents => allEvents.Where(e => e.Date >= DateTime.Now).ToList();
+    private List<EventItem> pastEvents => allEvents.Where(e => e.Date < DateTime.Now).ToList();
+
+    public class EventItem
+    {
+        public string Title { get; set; } = "";
+        public string Description { get; set; } = "";
+        public DateTime Date { get; set; }
+        public string Location { get; set; } = "";
+        public string Link { get; set; } = "";
+        public string Category { get; set; } = "";
+        public string CategoryColor { get; set; } = "primary";
+        public string Icon { get; set; } = "bi-calendar";
+    }
+}

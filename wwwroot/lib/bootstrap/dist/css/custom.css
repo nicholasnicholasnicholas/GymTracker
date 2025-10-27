@@ -1,0 +1,162 @@
+/* ==========================================
+   AUTH PAGE STYLING (Login & Register)
+   Fixed: Removed extra white background layer
+   ========================================== */
+
+/* Forest-green full background */
+.auth-page {
+    min-height: 100vh;
+    background: linear-gradient(160deg, #0b3d2e 0%, #14532d 100%);
+    display: flex;
+    align-items: flex-start; /* positions a bit higher */
+    justify-content: center;
+    padding-top: 80px;
+    margin: 0;
+}
+
+/* Centered wrapper for title + card — fully transparent */
+.auth-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    max-width: 420px;
+    width: 90%;
+    background: none !important; /* 🔥 ensures no white background */
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0; /* remove any spacing that might cause overlap */
+}
+
+/* Title */
+.auth-title {
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 2rem;
+    margin-bottom: 30px;
+    text-align: center;
+    letter-spacing: 0.5px;
+}
+
+/* White login/register card */
+.auth-card {
+    background-color: #d8eedb; /* subtle soft green */
+    width: 100%;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+    padding: 2rem;
+    text-align: center;
+    border: 1px solid #b6d8ba;
+}
+
+/* Fix Bootstrap or Blazor default white bg bleed */
+body,
+html {
+    background: none !important;
+}
+
+/* Remove any parent background color interference */
+main,
+.page,
+.layout,
+section {
+    background: transparent !important;
+    box-shadow: none !important;
+}
+
+/* Input fields */
+.auth-card input {
+    height: 45px;
+    font-size: 15px;
+    border-radius: 6px;
+}
+
+/* Login/Register button */
+.login-btn,
+.register-btn {
+    height: 45px;
+    font-weight: 600;
+    font-size: 16px;
+    background-color: #14532d;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    width: 100%;
+    transition: all 0.25s ease;
+    cursor: pointer;
+}
+
+.login-btn:hover,
+.register-btn:hover {
+    background-color: #1b6b3a;
+    transform: scale(1.02);
+}
+
+/* Google Sign-in button */
+.google-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    height: 45px;
+    background-color: white;
+    color: #222;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.google-btn img {
+    width: 20px;
+    height: 20px;
+}
+
+.google-btn:hover {
+    background-color: #f5f5f5;
+    transform: scale(1.01);
+}
+
+/* Links */
+.auth-link {
+    text-decoration: none;
+    font-weight: 600;
+    color: #14532d;
+}
+
+.auth-link:hover {
+    text-decoration: underline;
+}
+
+/* Smooth fade-in */
+.auth-card {
+    animation: fadeInUp 0.5s ease-out;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(25px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive layout */
+@media (max-width: 480px) {
+    .auth-page {
+        padding-top: 60px;
+    }
+
+    .auth-card {
+        padding: 1.5rem;
+    }
+
+    .auth-title {
+        font-size: 1.7rem;
+    }
+}
