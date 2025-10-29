@@ -150,11 +150,11 @@ h1:focus {
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
-    width: 12px;
-    height: 12px;
+    width: 16px;
+    height: 16px;
     background: var(--color-primary); /* theme color */
-    border-radius: 50%;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.25), 0 0 0 6px rgba(0,0,0,0.04);
+    border-radius: 100%;
+    box-shadow: 0 0 0 rgba(0,0,0,0.25), 0 0 0 4px var(--color-primary-lighter);
     z-index: 4000;
 }
 .user-pulse-icon .pulse-ring {
@@ -165,8 +165,8 @@ h1:focus {
     width: 12px;
     height: 12px;
     border-radius: 50%;
-    background: var(--color-primary-light);
-    animation: pulse 1.6s infinite cubic-bezier(0.66, 0, 0, 1);
+    background: var(--color-dark);
+    animation: pulse 3s infinite cubic-bezier(0.66, 0, 0, 1);
     z-index: 3999;
 }
 @keyframes pulse {
@@ -175,11 +175,11 @@ h1:focus {
         opacity: 0.9;
     }
     70% {
-        transform: translate(-50%, -50%) scale(2.6);
+        transform: translate(-50%, -50%) scale(10);
         opacity: 0;
     }
     100% {
-        transform: translate(-50%, -50%) scale(2.6);
+        transform: translate(-50%, -50%) scale(15);
         opacity: 0;
     }
 }

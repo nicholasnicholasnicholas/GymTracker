@@ -2,7 +2,7 @@
 @inject IJSRuntime JS
 @rendermode InteractiveServer
 
-<h3>📍 Nearest Gym </h3>
+<h1 class="mb-4 text-center">Map</h1>
 
 <button id="blazorGetLocationBtn" class="btn btn-primary" @onclick="GetLocation" disabled="@isLoading">
     @if (isLoading)
