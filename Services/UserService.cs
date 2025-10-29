@@ -1,7 +1,10 @@
 /*
-*   This file handles all user-related operations,
-*   such as registering, authenticating, and retrieving users.
-*   It interacts with the database via Entity Framework Core.
+*   This service handles all user-related operations:
+*   - Registering new users
+*   - Authenticating existing users (login)
+*   - Retrieving user information
+*   
+*   It interacts with the SQLite database through Entity Framework Core.
 */
 
 using GymTracker.Data;
@@ -19,38 +22,60 @@ namespace GymTracker.Services
             _context = context;
         }
 
-        // ✅ Register a new user (creates record if username doesn't exist)
+        // ✅ Register a new user (only if username doesn't exist)
         public async Task<bool> RegisterAsync(string username, string password)
         {
-            // Check if username already exists
-            if (await _context.Users.AnyAsync(u => u.Username == username))
+            // Validate input
+            if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
                 return false;
 
+            // Check if username already exists
+            bool exists = await _context.Users.AnyAsync(u => u.Username == username);
+            if (exists)
+                return false;
+
+            // Create and save new user with hashed password
             var user = new User
             {
                 Username = username,
-                PasswordHash = BCrypt.Net.BCrypt.HashPassword(password) // Hash password securely
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword(password)
             };
 
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
+
             return true;
         }
 
-        // ✅ Authenticate user (for Login)
+        // ✅ Authenticate user (login)
         public async Task<User?> AuthenticateAsync(string username, string password)
         {
+            // Validate input
+            if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
+                return null;
+
+            // Look for a user with the matching username
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
 
-            if (user != null && BCrypt.Net.BCrypt.Verify(password, user.PasswordHash))
-                return user; // success
+            // Reject if username not found
+            if (user == null)
+                return null;
 
-            return null; // failed login
+            // Verify the password using BCrypt
+            bool passwordValid = BCrypt.Net.BCrypt.Verify(password, user.PasswordHash);
+            if (!passwordValid)
+                return null;
+
+            // ✅ Login success
+            return user;
         }
 
-        // ✅ Optional: Get user by username
+        // ✅ Optional: Get a user by username (for profile, etc.)
         public async Task<User?> GetUserByUsernameAsync(string username)
         {
+            if (string.IsNullOrWhiteSpace(username))
+                return null;
+
             return await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
         }
     }

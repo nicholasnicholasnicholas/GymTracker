@@ -12,6 +12,8 @@ namespace GymTracker.Data
 
         // ✅ Only include Users for now (login/register only)
         public DbSet<User> Users { get; set; }
+        public DbSet<Event> Events { get; set; }
+
     }
 }
 
