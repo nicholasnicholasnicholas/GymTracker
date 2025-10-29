@@ -1,4 +1,5 @@
 @page "/register"
+@rendermode InteractiveServer
 @layout Components.Layout.AuthLayout
 @using GymTracker.Services
 @inject UserService UserService
@@ -45,23 +46,23 @@
 </div>
 
 @code {
-    private RegisterModel registerModel = new();
+    private RegisterModel registerModel = new RegisterModel();
     private string message = "";
 
     private async Task HandleValidSubmit()
     {
-        var existingUser = await UserService.GetUserByUsernameAsync(registerModel.Username);
+        bool success = await UserService.RegisterAsync(registerModel.Username, registerModel.Password);
 
-        if (existingUser != null)
+        if (success)
         {
-            message = "⚠️ Username already exists. Please choose another.";
-            return;
+            message = "✅ Registration successful! Redirecting to login...";
+            await Task.Delay(1000);
+            NavigationManager.NavigateTo("/login");
         }
-
-        await UserService.RegisterAsync(registerModel.Username, registerModel.Password);
-        message = "✅ Registration successful! Redirecting to login...";
-        await Task.Delay(1500);
-        NavigationManager.NavigateTo("/login");
+        else
+        {
+            message = "⚠️ Username already exists or invalid input.";
+        }
     }
 
     public class RegisterModel
@@ -70,4 +71,3 @@
         public string Password { get; set; } = "";
     }
 }
-

@@ -1,8 +1,11 @@
 @page "/login"
+@rendermode InteractiveServer
 @layout Components.Layout.AuthLayout
 @using GymTracker.Services
 @inject UserService UserService
 @inject NavigationManager NavigationManager
+@inject UserSessionService UserSessionService
+
 
 <div class="auth-card">
     <h3 class="text-center">Welcome Back</h3>
@@ -54,9 +57,11 @@
 
         if (user != null)
         {
+            UserSessionService.Login(loginModel.Username);
             message = "✅ Login successful! Redirecting...";
             await Task.Delay(1500);
             NavigationManager.NavigateTo("/");
+            
         }
         else
         {

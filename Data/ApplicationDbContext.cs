@@ -1,20 +1,25 @@
-using GymTracker.Models;
 using Microsoft.EntityFrameworkCore;
+using GymTracker.Models;
 
 namespace GymTracker.Data
 {
     public class ApplicationDbContext : DbContext
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
-            : base(options) { }
-        public DbSet<User> Users { get; set; }
-
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
+            : base(options)
         {
-            base.OnModelCreating(modelBuilder);
         }
+
+        // ✅ Only include Users for now (login/register only)
+        public DbSet<User> Users { get; set; }
+        public DbSet<Event> Events { get; set; }
+
     }
 }
+
+
+
+
 
 
 /*
