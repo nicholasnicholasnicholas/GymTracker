@@ -1,0 +1,217 @@
+@page "/profile"
+@rendermode InteractiveServer
+
+@using GymTracker.Services
+@inject UserService UserService
+@inject UserSessionService UserSessionService
+@inject NavigationManager NavigationManager
+
+@* for profile image compression *@
+@using SixLabors.ImageSharp
+@using SixLabors.ImageSharp.Processing
+
+<h1 class="mb-4 text-center fade-in-up">Your Profile</h1>
+
+<div class="d-flex justify-content-center">
+    <div class="container p-2 text-center shadow border-0 rounded-4 d-flex flex-row justify-content-between" style="min-width: 360px; max-width: 100%; width: auto; border-size: 0px; background-color: var(--color-primary-light)">
+        <div class="container p-3 text-center border-0 rounded-4 fade-in-up" style="min-width: 360px; max-width: 100%; width: auto; border-size: 0px;">
+            @*Profile picture stuff*@
+            <label class="pfp-upload-label mb-2 mt-4 border rounded-circle" for="pfpUpload">
+                <img src="@imageDataUrl" class="pfp-preview" />
+            </label>
+
+            <InputFile id="pfpUpload"
+                        OnChange="HandleImageUpload"
+                        accept="image/*"
+                        style="display: none;" />
+
+            @* Name/Pronouns/JoinDate*@
+            <div class="mb-3 text-center">
+                <div class="d-flex flex-row justify-content-center align-items-center w-100 gap-1">
+                    @if (nickname != UserSessionService.Username)
+                    {
+                        <div class="form fs-2">@nickname</div>
+                        <div class="form fs-4" style="color: var(--color-dark-light);">(@@@UserSessionService.Username)</div>
+                    }
+                    else
+                    {
+                        <div class="form fs-2">@UserSessionService.Username</div>
+                    }
+                </div>
+                <div class="form fs-4 mb-" style="color: var(--color-dark-light); size: 4px">@pronouns</div>
+                <div class="form fs-6 mb-0" style="color: var(--color-dark-light); size: 4px">Member since @dateJoined.ToString("MMMM dd, yyyy")</div>
+            </div>
+        </div>
+
+        <div class="container p-3 text-center border-0 rounded-4 fade-in-up" style="min-width: 360px; max-width: 100%; width: auto; border-size: 0px; background-color: var(--color-light);">
+            @* Nickname field *@
+            <div class="mb-3 text-start">
+                <label for="nicknameInput" class="form fs-5 mb-1">Nickname</label>
+                <InputText id="nicknameInput"
+                            class="form-control"
+                            @bind-Value="nickname"
+                            @oninput="(e) => OnFieldChanged()" />
+            </div>
+
+            @* Date of Birth field *@
+            <div class="mb-3 text-start">
+                <label for="dobInput" class="form fs-5 mb-1">Date of Birth</label>
+                <InputDate id="dobInput"
+                            class="form-control text-left"
+                            @bind-Value="dateOfBirth"
+                            @oninput="(e) => OnFieldChanged()" />
+            </div>
+
+            @* Pronoun Field *@
+            <div class="mb-3 text-start">
+                <label for="dobInput" class="form fs-5 mb-1">Pronouns</label>
+                <select class="form-select"
+                        @bind="pronouns"
+                        @oninput="(e) => OnFieldChanged()">
+                    <option value="" disabled selected>Select...</option>
+                    <option value="He/Him">He/Him</option>
+                    <option value="She/Her">She/Her</option>
+                    <option value="They/Them">They/Them</option>
+                    <option value="Other">Other</option>
+                    <option value="Prefer not to share">Prefer not to share</option>
+                </select>
+            </div>
+
+            @* Country Field *@
+            <div class="mb-3 text-start">
+                <label for="dobInput" class="form fs-5 mb-1">Country</label>
+                <select class="form-select"
+                        @bind="country"
+                        @oninput="(e) => OnFieldChanged()">
+                    <option value="" disabled selected>Select...</option>
+                    @foreach (var country in CountryLibrary.Countries)
+                    {
+                        <option value="@country">@country</option>
+                    }
+                </select>
+            </div>
+
+            @* Save Button *@
+            @if (hasProfileChanged)
+            {
+                <button class="btn button-success flex-fill justify-content-between align-items-center fs-5 mt-2 mb-1 @(hasProfileChanged ? "save-button-visible" : "save-button-hidden")"
+                        @onclick="SaveProfileInfo">
+                    <div class="d-flex align-items-center gap-2 fs-5">
+                        <strong>Save Changes</strong>
+                    </div>
+                </button>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    private string? imageDataUrl;
+    private string nickname = string.Empty;
+    private DateTime dateOfBirth = DateTime.MinValue;
+    private string pronouns = string.Empty;
+    private string country = string.Empty;
+
+    private DateTime dateJoined = DateTime.MinValue;
+
+    private string? message;
+    private bool hasProfileChanged = false;
+
+    // Store image bytes and MIME type temporarily after upload
+    private byte[]? uploadedImageBytes;
+    private string? uploadedImageMimeType;
+
+    private async Task HandleImageUpload(InputFileChangeEventArgs e)
+    {
+        var file = e.File;
+        if (file == null)
+        {
+            message = "No file selected.";
+            return;
+        }
+
+        using var inputStream = file.OpenReadStream(maxAllowedSize: 20 * 1024 * 1024);
+        using var image = await Image.LoadAsync(inputStream);
+
+        image.Mutate(x => x.Resize(new ResizeOptions
+        {
+            Mode = ResizeMode.Crop,
+            Size = new Size(256, 256)
+        }));
+
+        using var ms = new MemoryStream();
+        await image.SaveAsJpegAsync(ms);
+
+        uploadedImageBytes = ms.ToArray();
+        uploadedImageMimeType = "image/jpeg";
+
+        // Show preview only
+        imageDataUrl = $"data:{uploadedImageMimeType};base64,{Convert.ToBase64String(uploadedImageBytes)}";
+
+        // Mark as changed to show "Save" button
+        hasProfileChanged = true;
+    }
+
+    // Save everything
+    private async Task SaveProfileInfo()
+    {
+        var user = await UserService.GetUserByUsernameAsync(UserSessionService.Username);
+        if (user == null)
+        {
+            return;
+        }
+
+        user.Nickname = nickname;
+        user.DateOfBirth = dateOfBirth;
+        user.Pronouns = pronouns;
+        user.Country = country;
+
+        // Save the uploaded image if it exists
+        if (uploadedImageBytes != null && !string.IsNullOrWhiteSpace(uploadedImageMimeType))
+        {
+            bool imageSaved = await UserService.UpdateProfileImageAsync(
+                UserSessionService.Username,
+                uploadedImageBytes,
+                uploadedImageMimeType
+            );
+
+            // Clear stored image after saving
+            uploadedImageBytes = null;
+            uploadedImageMimeType = null;
+        }
+
+        await UserService.UpdateUserAsync(user);
+        UserSessionService.TriggerProfileSaved(); // optional
+        hasProfileChanged = false;
+    }
+
+    // Show save button when anything changes
+    private void OnFieldChanged()
+    {
+        hasProfileChanged = true;
+    }
+
+    // Init
+    protected override async Task OnInitializedAsync()
+    {
+        var user = await UserService.GetUserByUsernameAsync(UserSessionService.Username);
+
+        if (user != null)
+        {
+            nickname = string.IsNullOrWhiteSpace(user.Nickname) ? user.Username : user.Nickname;
+            dateOfBirth = user.DateOfBirth;
+            pronouns = string.IsNullOrWhiteSpace(user.Pronouns) ? string.Empty : user.Pronouns;
+            country = string.IsNullOrWhiteSpace(user.Country) ? string.Empty : user.Country;
+            dateJoined = user.DateJoined;
+        }
+
+        if (user?.ProfileImage != null && user.ProfileImageMimeType != null)
+        {
+            imageDataUrl = $"data:{user.ProfileImageMimeType};base64,{Convert.ToBase64String(user.ProfileImage)}";
+        }
+        else
+        {
+            imageDataUrl = "defaultProfilePic.jpg";
+        }
+    }
+}

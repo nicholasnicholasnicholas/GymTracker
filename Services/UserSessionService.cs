@@ -16,6 +16,14 @@ namespace GymTracker.Services
             IsLoggedIn = false;
             Username = string.Empty;
         }
+
+        public event Action? OnProfileSaved;
+        
+        public void TriggerProfileSaved()
+        {
+            OnProfileSaved?.Invoke();
+        }
+
     }
 }
 

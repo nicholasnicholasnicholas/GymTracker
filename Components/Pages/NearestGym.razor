@@ -148,12 +148,57 @@ else if (!string.IsNullOrEmpty(locationMessage) && !isLoading)
     // Simple in-memory gym dataset. Replace with API call or database as needed.
     private readonly List<Gym> gyms = new()
     {
-        // Fullerton area sample gyms (approximate coordinates)
-        new Gym("Fullerton Community Gym", 33.8703, -117.9243, "Downtown Fullerton"),
+        // Anaheim
+        new Gym("24 Hour Fitness Anaheim West", 33.8328, -117.9536, "3200 W Lincoln Ave"),
+        new Gym("Planet Fitness Anaheim", 33.8339, -117.9147, "2091 S State College Blvd"),
+        new Gym("LA Fitness - Anaheim Hills", 33.8589, -117.7407, "4500 E La Palma Ave"),
+
+        // Santa Ana
+        new Gym("LA Fitness - Santa Ana", 33.7456, -117.8646, "3820 S Bristol St"),
+        new Gym("24 Hour Fitness Santa Ana", 33.7328, -117.8369, "1400 N Grand Ave"),
+        new Gym("Planet Fitness Santa Ana", 33.7547, -117.8679, "5030 W 1st St"),
+
+        // Irvine
+        new Gym("Life Time - Lakeshore Irvine", 33.6699, -117.8545, "18007 Von Karman Ave"),
+        new Gym("Equinox Sports Club Orange County", 33.6796, -117.8553, "1980 Main St"),
+        new Gym("24 Hour Fitness Irvine Marketplace", 33.7053, -117.7719, "13752 Jamboree Rd"),
+        new Gym("LA Fitness - Irvine (Barranca)", 33.6757, -117.7600, "6400 Irvine Blvd"),
+
+        // Costa Mesa / Newport Beach
+        new Gym("Equinox Newport Beach (Fashion Island)", 33.6140, -117.8750, "19540 Jamboree Rd"),
+        new Gym("24 Hour Fitness Costa Mesa", 33.6809, -117.9133, "589 Anton Blvd"),
+        new Gym("Planet Fitness Costa Mesa", 33.6633, -117.9195, "2300 Harbor Blvd"),
+        new Gym("Crunch Fitness Costa Mesa", 33.6650, -117.9151, "2831 Harbor Blvd"),
+        new Gym("24 Hour Fitness Newport Beach", 33.6284, -117.9128, "230 Newport Center Dr"),
+
+        // Huntington Beach / Fountain Valley
+        new Gym("24 Hour Fitness Huntington Beach", 33.7084, -118.0055, "9051 Atlanta Ave"),
+        new Gym("Crunch Fitness Huntington Beach", 33.7227, -118.0036, "5880 Warner Ave"),
+        new Gym("LA Fitness - Fountain Valley", 33.7088, -117.9533, "18032 Brookhurst St"),
+        new Gym("Planet Fitness Fountain Valley", 33.7081, -117.9549, "16065 Brookhurst St"),
+
+        // Tustin / Orange
+        new Gym("LA Fitness - Tustin", 33.7231, -117.7963, "2300 Park Ave"),
+        new Gym("Planet Fitness Tustin", 33.7239, -117.7874, "2850 El Camino Real"),
+        new Gym("LA Fitness - Orange", 33.8096, -117.8360, "1500 E Village Way"),
+        new Gym("24 Hour Fitness Orange", 33.7993, -117.8185, "360 N Tustin St"),
+
+        // Fullerton / Brea / Buena Park
         new Gym("24 Hour Fitness Fullerton", 33.8866, -117.8883, "1801 E Chapman Ave"),
-        new Gym("Planet Fitness Fullerton", 33.8742, -117.9161, "123 Euclid St"),
+        new Gym("Planet Fitness Fullerton", 33.8742, -117.9161, "123 S Euclid St"),
         new Gym("LA Fitness - Fullerton", 33.8776, -117.9190, "500 N Harbor Blvd"),
-        new Gym("Downtown YMCA Fullerton", 33.8697, -117.9190, "201 W Commonwealth Ave")
+        new Gym("24 Hour Fitness Brea", 33.9267, -117.8878, "400 W Imperial Hwy"),
+        new Gym("LA Fitness - Brea", 33.9199, -117.8883, "383 W Imperial Hwy"),
+        new Gym("Crunch Fitness Buena Park", 33.8705, -117.9968, "8308 On the Mall"),
+
+        // South County (Mission Viejo / Laguna Niguel / Aliso Viejo / Lake Forest / San Clemente)
+        new Gym("LA Fitness - Mission Viejo", 33.5604, -117.6678, "27742 Crown Valley Pkwy"),
+        new Gym("Life Time - Laguna Niguel", 33.5404, -117.6884, "25600 Rancho Niguel Rd"),
+        new Gym("Renaissance ClubSport Aliso Viejo", 33.5758, -117.7258, "50 Enterprise"),
+        new Gym("LA Fitness - Lake Forest", 33.6436, -117.6905, "23641 El Toro Rd"),
+        new Gym("24 Hour Fitness San Clemente", 33.4306, -117.6135, "638 Camino De Los Mares"),
+        new Gym("LA Fitness - San Clemente", 33.4382, -117.6195, "900 Avenida Pico")
+
     };
 
     private List<NearestGymResult> nearestGyms = new();

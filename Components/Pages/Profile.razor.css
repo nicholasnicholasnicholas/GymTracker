@@ -1,0 +1,82 @@
+/* ========== TWEEN ANIMATIONS ========== */
+* {
+    transition: all 0.25s ease-in-out;
+}
+
+.container,
+input,
+select,
+button,
+label,
+img {
+    transition: all 0.3s ease-in-out;
+}
+
+/* Animate card on load */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in-up {
+    animation: fadeInUp 0.5s ease-out both;
+}
+
+/* Profile image hover: scale + slight shadow */
+.pfp-upload-label:hover img {
+    transform: scale(1.05);
+    box-shadow: 0 0 10px rgba(0,0,0,0.2);
+}
+
+/* Save button hover */
+button:hover {
+    transform: scale(1.03);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Form fields hover/focus */
+input:hover,
+input:focus,
+select:hover,
+select:focus {
+    border-color: #4caf50;
+    box-shadow: 0 0 6px rgba(76, 175, 80, 0.5);
+}
+
+/* --- SAVE BUTTON SCALE-Y ANIMATION (ONLY FOR THIS BUTTON) --- */
+@keyframes saveButtonScaleY {
+    0% {
+        opacity: 0;
+        transform: scaleY(0.2);
+    }
+    80% {
+        opacity: 1;
+        transform: scaleY(1.15);
+    }
+    100% {
+        transform: scaleY(1);
+    }
+}
+
+/* Initial hidden state */
+.save-button-hidden {
+    max-height: 0;
+    transform: translateY(-10px) scaleY(0);
+    pointer-events: none;
+    transition: all 0.3s ease;
+}
+
+/* Visible state with scaleY and slight Y offset */
+.save-button-visible {
+    max-height: 100px; /* Enough to contain button */
+    transform: translateY(0) scaleY(1);
+    pointer-events: auto;
+    transition: all 0.3s ease;
+    transform-origin: top center;
+}
