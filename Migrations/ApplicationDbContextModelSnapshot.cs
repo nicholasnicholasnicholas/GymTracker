@@ -137,6 +137,7 @@ namespace GymTracker.Migrations
                             Title = "OC Marathon Running Event"
                         });
                 });
+            modelBuilder.HasAnnotation("ProductVersion", "9.0.10");
 
             modelBuilder.Entity("GymTracker.Models.User", b =>
                 {
@@ -144,7 +145,31 @@ namespace GymTracker.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("Country")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("DateJoined")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("DateOfBirth")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Nickname")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("PasswordHash")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<byte[]>("ProfileImage")
+                        .HasColumnType("BLOB");
+
+                    b.Property<string>("ProfileImageMimeType")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Pronouns")
                         .IsRequired()
                         .HasColumnType("TEXT");
 

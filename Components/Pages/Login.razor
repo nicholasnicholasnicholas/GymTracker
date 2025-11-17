@@ -55,16 +55,19 @@
 {
     var user = await UserService.AuthenticateAsync(loginModel.Username, loginModel.Password);
 
-    if (user != null)
-    {
-        await UserSessionService.Login(loginModel.Username);
-        NavigationManager.NavigateTo("/newsevents", true);
+        if (user != null)
+        {
+            await UserSessionService.Login(loginModel.Username);
+            message = "Login successful! Redirecting...";
+            await Task.Delay(1500);
+            NavigationManager.NavigateTo("/");
+            
+        }
+        else
+        {
+            message = "Invalid username or password.";
+        }
     }
-    else
-    {
-        message = "Invalid username or password.";
-    }
-}
 
     public class LoginModel
     {

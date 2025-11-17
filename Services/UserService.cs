@@ -38,7 +38,8 @@ namespace GymTracker.Services
             var user = new User
             {
                 Username = username,
-                PasswordHash = BCrypt.Net.BCrypt.HashPassword(password)
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword(password),
+                DateJoined = DateTime.Today
             };
 
             _context.Users.Add(user);
@@ -78,5 +79,26 @@ namespace GymTracker.Services
 
             return await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
         }
+
+        // Update profile image
+        public async Task<bool> UpdateProfileImageAsync(string username, byte[] imageData, string mimeType)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
+            if (user == null) return false;
+
+            user.ProfileImage = imageData;
+            user.ProfileImageMimeType = mimeType;
+
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> UpdateUserAsync(User user)
+        {
+            _context.Users.Update(user);
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
     }
 }

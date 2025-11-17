@@ -1,0 +1,112 @@
+@rendermode InteractiveServer
+@using GymTracker.Services
+@inject UserService UserService
+@inject UserSessionService UserSessionService
+
+@*<a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>*@
+
+@if (UserSessionService.IsLoggedIn)
+{
+    <div class="nav-item dropdown position-relative">
+        <button class="profile-button" 
+            @onclick="ToggleDropdown">
+            
+            @if (!string.IsNullOrEmpty(imageDataUrl))
+            {
+                <img src="@imageDataUrl"
+                    class="rounded-circle"
+                    style="width: 36px; height: 36px; object-fit: cover;" />
+            }
+            else {
+                <span class="material-symbols-outlined profile-icon" style="font-size: 36px">account_circle</span>
+            }
+            
+            <span style="font-size: 10px;">▼</span>
+        </button>
+
+        <ul class="profile-dropdown @(showDropdown ? "show" : "")">
+            <div class="container-fluid px-2 py-2 mt-0">
+                <h4 class="mb-0 text-center">Hi, @nickname!</h4>
+            </div>
+
+            <div class="container-fluid container-white px-3 py-3 mt-2 rounded">
+                <li>
+                    <a class="dropdown-item" @onclick="ToggleDropdown" href="/profile">Profile</a>
+                </li>
+                @*
+                <li>
+                    <a class="dropdown-item" @onclick="ToggleDropdown" href="/settings">Settings</a>
+                </li>
+                *@
+                <li><hr class="dropdown-divider" /></li>
+                <li>
+                    <a class="dropdown-item" @onclick="OnLogout" href="/">Logout</a>
+                </li>
+            </div>
+        </ul>
+    </div>
+}
+
+else {
+    <div class="nav-item">
+        <NavLink class="nav-link nav-button-login" href="login">
+            Sign in
+        </NavLink>
+    </div>
+
+    <div class="nav-item">
+        <NavLink class="nav-link nav-button-register" href="register">
+            Create an account
+        </NavLink>
+    </div> 
+}
+
+@code {
+    private bool showDropdown = false;
+    private string nickname = string.Empty;
+    private string? imageDataUrl;
+
+    private void ToggleDropdown()
+    {
+        showDropdown = !showDropdown;
+        StateHasChanged();
+    }
+
+    private void OnLogout()
+    {
+        UserSessionService.Logout();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Subscribe to event
+        UserSessionService.OnProfileSaved += OnProfileSaved;
+
+        await LoadUserProfile();
+    }
+
+    private async Task LoadUserProfile()
+    {
+        var user = await UserService.GetUserByUsernameAsync(UserSessionService.Username);
+
+        if (user != null) {
+            nickname = string.IsNullOrWhiteSpace(user.Nickname) ? UserSessionService.Username : user.Nickname;
+        }
+
+        if (user?.ProfileImage != null && user.ProfileImageMimeType != null)
+        {
+            imageDataUrl = $"data:{user.ProfileImageMimeType};base64,{Convert.ToBase64String(user.ProfileImage)}";
+            StateHasChanged(); // ensures UI updates if called outside of render cycle
+        }
+    }
+
+    private async void OnProfileSaved()
+    {
+        await LoadUserProfile();
+    }
+
+    public void Dispose()
+    {
+        UserSessionService.OnProfileSaved -= OnProfileSaved;
+    }
+}

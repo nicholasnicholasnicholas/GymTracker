@@ -2,6 +2,7 @@ using GymTracker.Components;
 using GymTracker.Services;
 using GymTracker.Data;
 using Microsoft.EntityFrameworkCore;
+using Blazored.LocalStorage;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,6 +21,13 @@ Console.WriteLine($"Using DB at: {dbPath}");
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlite($"Data Source={dbPath}"));
+
+// Add user service for data operations
+builder.Services.AddScoped<UserService>();
+builder.Services.AddAuthorizationCore();
+
+// Add local storage
+builder.Services.AddBlazoredLocalStorage();
 
 var app = builder.Build();
 
