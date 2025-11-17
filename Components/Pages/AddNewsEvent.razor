@@ -1,0 +1,77 @@
+@page "/newevents/add"
+@using GymTracker.Models
+@inject ApplicationDbContext Db
+@inject NavigationManager NavigationManager
+
+<div class="container py-4">
+
+    <h2 class="text-center mb-4" style="color:#085F4E;">
+        Add News or Event
+    </h2>
+
+    <EditForm Model="@newEvent" OnValidSubmit="SaveEvent" FormName="AddEventForm">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="form-group mb-4">
+            <label class="fw-semibold">Title</label>
+            <InputText class="form-control form-control-lg" @bind-Value="newEvent.Title" />
+        </div>
+
+        <div class="form-group mb-4">
+            <label class="fw-semibold">Description</label>
+            <InputTextArea class="form-control form-control-lg" rows="4"
+                           @bind-Value="newEvent.Description" />
+        </div>
+
+        <div class="form-group mb-4">
+            <label class="fw-semibold">Date</label>
+            <InputDate class="form-control form-control-lg"
+                       @bind-Value="newEvent.Date" />
+        </div>
+
+        <div class="form-group mb-4">
+            <label class="fw-semibold">Location</label>
+            <InputText class="form-control form-control-lg"
+                       @bind-Value="newEvent.Location" />
+        </div>
+
+        <div class="form-group mb-4">
+            <label class="fw-semibold">Event Link (Optional)</label>
+            <InputText class="form-control form-control-lg"
+                       @bind-Value="newEvent.Link" placeholder="https://example.com" />
+            <small class="text-muted">Add a webpage for more info if available.</small>
+        </div>
+
+        <button type="submit" class="btn btn-success w-100 py-2 fs-5">
+            Save Event
+        </button>
+    </EditForm>
+
+    <div class="text-center mt-3">
+        <button class="btn btn-outline-secondary"
+                @onclick="GoBack">
+            Cancel
+        </button>
+    </div>
+
+</div>
+
+@code {
+    private Event newEvent = new()
+    {
+        Date = DateTime.Today
+    };
+
+    private async Task SaveEvent()
+    {
+        Db.Events.Add(newEvent);
+        await Db.SaveChangesAsync();
+        NavigationManager.NavigateTo("/newsevents", true);
+    }
+
+    private void GoBack()
+    {
+        NavigationManager.NavigateTo("/newsevents");
+    }
+}
