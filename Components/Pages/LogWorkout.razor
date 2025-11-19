@@ -6,10 +6,12 @@
 @using GymTracker.ViewModels
 @using GymTracker.Models
 @using GymTracker.Data
+@using GymTracker.Services
 
 @inject Blazored.LocalStorage.ILocalStorageService LocalStorage
+@inject UserSessionService UserSessionService
 
-<h1 class="mb-4">Log Workout</h1>
+<h1 class="mb-4 text-center">Journal</h1>
 
 <!-- Date and Workout Stopwatch containers -->
 <div class="container-fluid container-white px-0 rounded">
@@ -48,7 +50,7 @@
 
 <!-- Code - Stopwatch -->
 @code {
-     private string buttonText => isWorkoutActive ? "Stop" : "Start";
+    private string buttonText => isWorkoutActive ? "Stop" : "Start";
     private string buttonType => isWorkoutActive ? "btn button-danger" : "btn button-success";
 
     private bool isWorkoutActive = false;
@@ -110,12 +112,58 @@
 {
     <div class="container-fluid container-white px-3 py-3 mt-3 rounded">
         <label class="form-label fs-4"><strong>Journal</strong></label>
+
+        <!-- Exercise -->
+        @if (currentSession.WorkoutEntries.Count == 0)
+        {
+            <p class="text-muted">No exercises logged for this date.</p>
+        }
+
+        @for (int i = 0; i < currentSession.WorkoutEntries.Count; i++)
+        {
+            var entry = currentSession.WorkoutEntries[i];
+
+            <div class="card mb-2">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <strong>@entry.ExerciseName</strong>
+                    <button class="btn btn-sm btn-outline-secondary" @onclick="() => ToggleExercise(i)">
+                        @(IsExpanded(i) ? "Hide" : "Show")
+                    </button>
+                </div>
+
+                @if (IsExpanded(i))
+                {
+                    <div class="card-body">
+                        @for (int j = 0; j < entry.Sets.Count; j++)
+                        {
+                            var set = entry.Sets[j];
+                            <div class="d-flex gap-2 mb-2">
+                                <input type="number" class="form-control" placeholder="Weight (lbs)" @bind="set.Weight" />
+                                <input type="number" class="form-control" placeholder="Reps" @bind="set.Reps" />
+                            </div>
+                        }
+
+                        <button class="btn btn-sm btn-outline-success" @onclick="() => AddSet(entry)">+ Add Set</button>
+                    </div>
+                }
+            </div>
+        }
+
+
         <!-- Add excercise -->
         <div class="d-flex gap-2">
+            <select class="form-select" @bind="newExerciseName">
+                <option value="">Select Exercise</option>
+                @foreach (var exercise in ExerciseLibrary.All)
+                {
+                    <option value="@exercise.Name">@exercise.Name</option>
+                }
+            </select>
+
             <button class="btn button-success flex-fill d-flex justify-content-between align-items-center fs-5" @onclick="AddExercise">
                 <div class="d-flex align-items-center gap-2 fs-5">
                     <span>+</span>
-                    <strong>Add Exercise</strong>
+                    <strong>Add</strong>
                 </div>
             </button>
         </div>
@@ -126,6 +174,7 @@ else
     <p>Loading workout session...</p>
 }
 
+@*
 @if (currentSession != null)
 {
     <div class="container-fluid container-white px-3 py-3 mt-3 rounded">
@@ -190,7 +239,7 @@ else
 {
     <p>Loading workout session...</p>
 }
-
+*@
 
 @code {
     private WorkoutSession? currentSession;

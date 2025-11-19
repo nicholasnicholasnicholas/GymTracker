@@ -1,5 +1,4 @@
-﻿@inject IConfiguration Configuration
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -9,57 +8,28 @@
     <link rel="stylesheet" href="@Assets["lib/bootstrap/dist/css/bootstrap.min.css"]" />
     <link rel="stylesheet" href="@Assets["app.css"]" />
     <link rel="stylesheet" href="@Assets["GymTracker.styles.css"]" />
+    <link rel="stylesheet" href="lib/bootstrap/dist/css/custom.css"> <!-- ADDED THIS LINE TO LINK CUSTOM CSS FILE -->
+    
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" /> <!-- THIS IS GOOGLE ICONS -->
     <ImportMap />
     <link rel="icon" type="image/png" href="favicon.png" />
     <HeadOutlet />
+
+    <!-- Cropper.js CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/cropperjs@1.5.13/dist/cropper.min.css" rel="stylesheet">
 </head>
 
 <body>
     <Routes />
+    <!-- geolocation shit -->
     <script src="@Assets["geolocation.js"]"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="@Assets["geolocation-map.js"]"></script>
 
-    @* Google Maps JS (client key from config) *@
-    <script>
-        window._GOOGLE_MAPS_KEY = "@Configuration["GoogleMaps:ClientKey"]";
-        window._GOOGLE_MAP_ID = "@Configuration["GoogleMaps:MapId"]";
-    </script>
-    <!-- Dynamically load Google Maps JS using the configured client key. This ensures the client key and libraries are included even if the Configuration value is missing at render time. -->
-    <!-- Load Google Maps JS first, then google-maps.js to guarantee order -->
-    <script>
-        (function () {
-            var k = window._GOOGLE_MAPS_KEY;
-            var mid = window._GOOGLE_MAP_ID;
-            if (!k) {
-                console.warn('Google Maps client key not set (window._GOOGLE_MAPS_KEY)');
-            }
-            var params = [];
-            if (k) params.push('key=' + encodeURIComponent(k));
-            params.push('libraries=' + encodeURIComponent('places,marker'));
-            params.push('loading=async');
-            params.push('v=weekly');
-            if (mid) params.push('map_ids=' + encodeURIComponent(mid));
-            var url = 'https://maps.googleapis.com/maps/api/js?' + params.join('&');
-            console.debug('Loading Google Maps script:', url);
-            var s = document.createElement('script');
-            s.src = url;
-            s.async = false; // ensure blocking load
-            s.defer = false;
-            s.onload = function () {
-                console.debug('Google Maps script loaded');
-                // Only load google-maps.js after Maps JS is ready
-                var gms = document.createElement('script');
-                gms.src = '@Assets["google-maps.js"]';
-                gms.async = false;
-                gms.defer = false;
-                gms.onload = function () { console.debug('google-maps.js loaded'); };
-                gms.onerror = function (e) { console.error('Failed to load google-maps.js', e); };
-                document.head.appendChild(gms);
-            };
-            s.onerror = function (e) { console.error('Failed to load Google Maps script', e); };
-            document.head.appendChild(s);
-        })();
-    </script>
+    <!-- cropper.js shit -->
+    <script src="https://cdn.jsdelivr.net/npm/cropperjs@1.5.13/dist/cropper.min.js"></script>
+    <script src="js/cropperInterop.js"></script>
 
     <script src="_framework/blazor.web.js"></script>
 </body>

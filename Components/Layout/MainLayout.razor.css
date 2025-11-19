@@ -16,9 +16,13 @@ main {
 .top-row {
     background-image: linear-gradient(90deg, var(--color-shadow) 0%, var(--color-light) 50%);
     justify-content: flex-end;
-    height: 6rem;
+    height: 4.75rem;
     display: flex;
     align-items: center;
+    
+    position: relative;      /* Ensure dropdowns can position properly */
+    overflow: visible;       /* Let the dropdown escape the container */
+    z-index: 1000;           /* Ensure it's above other elements */
 }
 
     .top-row ::deep a, .top-row ::deep .btn-link {
@@ -28,7 +32,7 @@ main {
     }
 
     .top-row ::deep a:hover, .top-row ::deep .btn-link:hover {
-        text-decoration: underline;
+        text-decoration: none;
     }
 
     .top-row ::deep a:first-child {
@@ -71,9 +75,7 @@ main {
     }
 
     .top-row, article {
-        padding-top: 2.5rem !important;
-        padding-left: 3rem !important;
-        padding-right: 1.5rem !important;
+
     }
 }
 
