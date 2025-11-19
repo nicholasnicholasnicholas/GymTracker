@@ -10,6 +10,16 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
+// Allow API controllers for server-side endpoints (Google Places proxy etc.)
+builder.Services.AddControllers();
+
+// Register Google Places service and an HttpClient used for calling Google's web APIs.
+builder.Services.AddHttpClient<GooglePlacesService>();
+builder.Services.AddScoped<GooglePlacesService>();
+
+// Add in-memory cache for Places responses (used by GooglePlacesService)
+builder.Services.AddMemoryCache();
+
 
 
 //  Register EF core with a SQLite database
@@ -39,5 +49,8 @@ app.UseAntiforgery();
 app.MapStaticAssets();
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
+
+// Map API controllers (e.g., /api/places/nearby)
+app.MapControllers();
 
 app.Run();

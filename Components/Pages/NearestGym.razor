@@ -1,5 +1,8 @@
 @page "/nearest-gym"
 @inject IJSRuntime JS
+@inject HttpClient Http
+@inject NavigationManager Navigation
+@using GymTracker.Models
 @rendermode InteractiveServer
 
 <h3>📍 Nearest Gym </h3>
@@ -24,9 +27,13 @@
 {
     <h5 class="mt-3">Nearby gyms</h5>
     <ul class="list-group">
-        @foreach (var g in nearestGyms)
+        @for (int i = 0; i < nearestGyms.Count; i++)
         {
-            <li class="list-group-item d-flex justify-content-between align-items-start">
+            var g = nearestGyms[i];
+            // Match by Name, Latitude, and Longitude only
+            int markerIndex = gyms.FindIndex(x => x.Name == g.Name && x.Latitude == g.Latitude && x.Longitude == g.Longitude);
+            if (markerIndex == -1) markerIndex = 0; // fallback to first marker if not found
+            <li class="list-group-item d-flex justify-content-between align-items-start" style="cursor:pointer;" @onclick="() => PanToMarker(markerIndex)">
                 <div>
                     <div class="fw-bold">@g.Name</div>
                     <div class="text-muted small">@g.Address</div>
@@ -59,8 +66,8 @@ else if (!string.IsNullOrEmpty(locationMessage) && !isLoading)
 
                         // If map helper is present, add a user marker and pan to it
                         try {
-                            if (window.geolocationMap && typeof window.geolocationMap.addUserMarker === 'function') {
-                                window.geolocationMap.addUserMarker('nearestGymMap', p.Latitude, p.Longitude, { pan: true });
+                            if (window.googleMaps && typeof window.googleMaps.addUserMarker === 'function') {
+                                window.googleMaps.addUserMarker(p.Latitude, p.Longitude);
                             }
                         } catch (mapErr) {
                             console.error('Fallback map update error', mapErr);
@@ -83,14 +90,13 @@ else if (!string.IsNullOrEmpty(locationMessage) && !isLoading)
 </script>
 
 <div class="mt-3">
-    <div id="nearestGymMap" style="height: 400px; width: 100%; border: 1px solid #ddd; border-radius:4px;"></div>
+    <GoogleMap TMarker="object" CenterLat="33.8703" CenterLng="-117.9243" Height="400px" Width="100%" Zoom="13" Markers="mapMarkers" />
 </div>
 
 @code {
     private string? locationMessage = string.Empty;
     // debugInfo removed
     private bool isLoading = false;
-    private bool isSearching = false;
 
     private async Task GetLocation()
     {
@@ -107,18 +113,60 @@ else if (!string.IsNullOrEmpty(locationMessage) && !isLoading)
             var raw = await JS.InvokeAsync<object>("getUserLocation");
             await JS.InvokeVoidAsync("console.log", "Blazor: raw result", raw);
 
+
             // Then map to the typed object
             var pos = await JS.InvokeAsync<Geolocation>("getUserLocation");
             locationMessage = $"Lat: {pos.Latitude}, Lng: {pos.Longitude}";
 
-            // Compute nearest gyms from this position
+            // Try fetching nearby gyms from server-side Places proxy
+            try
+            {
+                var apiUrl = $"{Navigation.BaseUri}api/places/nearby?lat={pos.Latitude}&lng={pos.Longitude}&radius=5000";
+                var apiGyms = await Http.GetFromJsonAsync<List<Gym>>(apiUrl);
+                // Log the API result for debugging
+                await JS.InvokeVoidAsync("console.log", "API nearby gyms returned count:", apiGyms == null ? 0 : apiGyms.Count);
+                await JS.InvokeVoidAsync("console.log", "API gyms raw:", apiGyms);
+
+                if (apiGyms != null && apiGyms.Count > 0)
+                {
+                    gyms = apiGyms;
+
+                    // Update map markers to show the fetched gyms --- wait for googleMaps helper first
+                    var markers = gyms.Select(g => new { name = g.Name, address = g.Address, latitude = g.Latitude, longitude = g.Longitude }).ToArray();
+                    await JS.InvokeVoidAsync("console.log", "About to call googleMaps.addMarkers with marker count:", markers.Length);
+                    if (await WaitForGoogleMapsAsync())
+                    {
+                        try
+                        {
+                            // Ensure the map has finished initializing (drains any queued requests) before adding markers
+                            try { await JS.InvokeAsync<object>("googleMaps.ensureReady"); } catch { /* ignore if ensureReady not present */ }
+                            await JS.InvokeVoidAsync("googleMaps.addMarkers", markers);
+                        }
+                        catch (JSException jsEx)
+                        {
+                            await JS.InvokeVoidAsync("console.error", "JSException calling googleMaps.addMarkers:", jsEx.Message, jsEx.StackTrace);
+                        }
+                    }
+                    else
+                    {
+                        await JS.InvokeVoidAsync("console.warn", "googleMaps helper not available when attempting to add markers");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                await JS.InvokeVoidAsync("console.error", "Failed to fetch nearby gyms", ex.Message);
+            }
+
+            // Compute nearest gyms from the (possibly updated) gyms list
             await ComputeNearestGymsAsync(pos.Latitude, pos.Longitude);
 
             // Add a user marker and re-center the map if the helper is available
             try
             {
-                // Pass color options to match app theme and request a bounce
-                await JS.InvokeVoidAsync("geolocationMap.addUserMarker", "nearestGymMap", pos.Latitude, pos.Longitude, new { pan = true, zoom = 13, popup = "You are here", color = "var(--color-primary)", ringColor = "var(--color-primary-light)" });
+                // Ensure map is ready then add a simple user marker via google maps helper
+                try { await JS.InvokeAsync<object>("googleMaps.ensureReady"); } catch { /* ignore if ensureReady not present */ }
+                await JS.InvokeVoidAsync("googleMaps.addUserMarker", pos.Latitude, pos.Longitude);
             }
             catch (JSException) { /* ignore if map helper is not present */ }
         }
@@ -145,37 +193,29 @@ else if (!string.IsNullOrEmpty(locationMessage) && !isLoading)
         public double Longitude { get; set; }
     }
 
-    // Simple in-memory gym dataset. Replace with API call or database as needed.
-    private readonly List<Gym> gyms = new()
-    {
-        // Fullerton area sample gyms (approximate coordinates)
-        new Gym("Fullerton Community Gym", 33.8703, -117.9243, "Downtown Fullerton"),
-        new Gym("24 Hour Fitness Fullerton", 33.8866, -117.8883, "1801 E Chapman Ave"),
-        new Gym("Planet Fitness Fullerton", 33.8742, -117.9161, "123 Euclid St"),
-        new Gym("LA Fitness - Fullerton", 33.8776, -117.9190, "500 N Harbor Blvd"),
-        new Gym("Downtown YMCA Fullerton", 33.8697, -117.9190, "201 W Commonwealth Ave")
-    };
+    // Gyms list populated at runtime from server-side API or local fallback
+    private List<Gym> gyms = new();
+    private IEnumerable<object> mapMarkers => gyms.Select(g => new { name = g.Name, address = g.Address, latitude = g.Latitude, longitude = g.Longitude, rating = g.Rating, hours = g.Hours, photoUrl = g.PhotoUrl });
 
     private List<NearestGymResult> nearestGyms = new();
 
     private async Task ComputeNearestGymsAsync(double userLat, double userLng)
     {
-        isSearching = true;
-        StateHasChanged();
-
-        await Task.Yield(); // allow UI to update
+        //debug
+        await Task.Delay(1000);
 
             nearestGyms = gyms
             .Select(g => new NearestGymResult
             {
                 Name = g.Name,
                 Address = g.Address,
-                DistanceMiles = HaversineDistanceMiles(userLat, userLng, g.Latitude, g.Longitude)
+                DistanceMiles = HaversineDistanceMiles(userLat, userLng, g.Latitude, g.Longitude),
+                Latitude = g.Latitude,
+                Longitude = g.Longitude
             })
             .OrderBy(r => r.DistanceMiles)
             .ToList();
 
-        isSearching = false;
         StateHasChanged();
     }
 
@@ -195,33 +235,49 @@ else if (!string.IsNullOrEmpty(locationMessage) && !isLoading)
 
     private static double ToRadians(double angle) => (Math.PI / 180) * angle;
 
-    private record Gym(string Name, double Latitude, double Longitude, string Address);
-
     private class NearestGymResult
     {
         public string Name { get; set; } = string.Empty;
         public string Address { get; set; } = string.Empty;
         public double DistanceMiles { get; set; }
+        public double Latitude { get; set; }
+        public double Longitude { get; set; }
     }
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    // Map initialization is now handled by the GoogleMap component
+
+    private async Task<bool> WaitForGoogleMapsAsync(int attempts = 30, int delayMs = 100)
     {
-        if (firstRender)
+        for (int i = 0; i < attempts; i++)
         {
-            // Center map on Fullerton, CA (approx)
-            var fullertonLat = 33.8703;
-            var fullertonLng = -117.9243;
             try
             {
-                await JS.InvokeVoidAsync("geolocationMap.initMap", "nearestGymMap", fullertonLat, fullertonLng, 13);
-
-                // Add initial markers from our gyms list
-                var markers = gyms.Select(g => new { name = g.Name, address = g.Address, latitude = g.Latitude, longitude = g.Longitude }).ToArray();
-                await JS.InvokeVoidAsync("geolocationMap.addMarkers", "nearestGymMap", markers);
+                // Check that google and google.maps and our helper are present
+                var exists = await JS.InvokeAsync<bool>("eval", "(typeof window.google !== 'undefined' && typeof window.google.maps !== 'undefined' && typeof window.googleMaps !== 'undefined')");
+                if (exists) return true;
             }
-            catch (JSException) { /* ignore if map script not available */ }
+            catch (JSException)
+            {
+                // ignore and retry
+            }
+            await Task.Delay(delayMs);
         }
+        return false;
     }
 
     // Keep the fallback click handler, but don't show availability checks on render
+
+    private async Task PanToMarker(int index)
+    {
+        if (index >= 0 && index < gyms.Count)
+        {
+            var gym = gyms[index];
+            await JS.InvokeVoidAsync("console.log", $"PanToMarker: index={index}, Name={gym.Name}, Lat={gym.Latitude}, Lng={gym.Longitude}");
+        }
+        else
+        {
+            await JS.InvokeVoidAsync("console.log", $"PanToMarker: index={index} (out of range)");
+        }
+        await JS.InvokeVoidAsync("googleMaps.panToMarker", index);
+    }
 }
