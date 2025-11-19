@@ -230,3 +230,43 @@ h1:focus {
     color: #222;
     white-space: nowrap;
 }
+
+/* Google Maps info window custom card styles */
+.gm-info-card {
+    background: var(--color-light);
+    border-radius: 10px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.12);
+    padding: 0;
+    min-width: 240px;
+    max-width: 320px;
+    border: none;
+}
+.gm-info-card .card-body {
+    padding: 1.25rem;
+}
+.gm-info-card .card-title {
+    color: var(--color-dark);
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+.gm-info-card .card-subtitle {
+    color: var(--color-primary);
+    font-size: 0.95rem;
+}
+.gm-info-card .btn-success {
+    background-color: var(--color-primary);
+    color: var(--color-dark);
+    border: none;
+    font-weight: 500;
+}
+.gm-info-card .badge.bg-primary {
+    background-color: var(--color-primary);
+    color: var(--color-dark);
+}
+.gm-info-card img {
+    border-radius: 8px;
+    margin-bottom: 0.75rem;
+    max-height: 140px;
+    object-fit: cover;
+    width: 100%;
+}
