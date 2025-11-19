@@ -1,8 +1,8 @@
 using GymTracker.Components;
 using GymTracker.Services;
-using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
 using GymTracker.Data;
 using Microsoft.EntityFrameworkCore;
+using Blazored.LocalStorage;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,29 +10,40 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
+// Add user session service for managing login state
+builder.Services.AddScoped<UserSessionService>();
 
+<<<<<<< HEAD
+=======
+// ✅ Ensure database uses correct absolute path
+var dbPath = Path.Combine(Directory.GetCurrentDirectory(), "GymTracker.db");
+Console.WriteLine($"💾 Using DB at: {dbPath}");
+>>>>>>> 28edec13a97a88b688611b6a85ce50eab1b220be
 
-//  Register EF core with a SQLite database
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlite($"Data Source={dbPath}"));
 
 // Add user service for data operations
 builder.Services.AddScoped<UserService>();
+builder.Services.AddAuthorizationCore();
 
+// Add local storage
+builder.Services.AddBlazoredLocalStorage();
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 28edec13a97a88b688611b6a85ce50eab1b220be
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error", createScopeForErrors: true);
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
 app.UseHttpsRedirection();
-
 
 app.UseAntiforgery();
 

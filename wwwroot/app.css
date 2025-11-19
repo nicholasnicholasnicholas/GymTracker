@@ -7,6 +7,7 @@
     --color-shadow: #F1F7F4;
     --color-light: #FFFFFF;
     --color-dark: #00554E;
+    --color-dark-light: #008165;
     --color-bg: #FFFFFF;
     --font-main: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 }
@@ -142,9 +143,199 @@ h1:focus {
 .user-pulse-icon {
     width: 24px;
     height: 24px;
+<<<<<<< HEAD
+=======
     display: inline-block;
     position: relative;
 }
+.user-pulse-icon .pulse-dot {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 16px;
+    height: 16px;
+    background: var(--color-primary); /* theme color */
+    border-radius: 100%;
+    box-shadow: 0 0 0 rgba(0,0,0,0.25), 0 0 0 4px var(--color-primary-lighter);
+    z-index: 4000;
+}
+.user-pulse-icon .pulse-ring {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--color-dark);
+    animation: pulse 3s infinite cubic-bezier(0.66, 0, 0, 1);
+    z-index: 3999;
+}
+@keyframes pulse {
+    0% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 0.9;
+    }
+    70% {
+        transform: translate(-50%, -50%) scale(10);
+        opacity: 0;
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(15);
+        opacity: 0;
+    }
+}
+
+/* brief bounce when marker is placed */
+.user-pulse-icon.bounce {
+    animation: bounce 0.6s ease-out;
+}
+@keyframes bounce {
+    0% { transform: translate(-50%, -60%) scale(0.98); }
+    30% { transform: translate(-50%, -72%) scale(1.12); }
+    50% { transform: translate(-50%, -60%) scale(0.98); }
+    70% { transform: translate(-50%, -66%) scale(1.04); }
+    100% { transform: translate(-50%, -60%) scale(1); }
+}
+
+.container-white {
+    background-color: var(--color-light);
+}
+
+.container-light {
+    background-color: var(--color-shadow);
+}
+
+.container-date {
+    background-color: var(--color-primary-light);
+    color: var(--color-dark);
+    border: none
+}
+
+.button-success {
+    background-color: var(--color-primary-light);
+    color: var(--color-dark);
+}
+
+.button-danger {
+    background-color: var(--color-dark);
+    color: var(--color-primary);
+}
+
+/* login and register buttons */
+.nav-button-login {
+    display: inline-flex;
+    align-items: center;
+    background-color: transparent; /* Bootstrap primary */
+    color: var(--color-dark);
+    border-radius: 4px;
+    text-decoration: none;
+    transition: background-color 0.5s ease;
+    font-weight: 500;
+}
+
+.nav-button-login:hover {
+    color: var(--color-dark-light);
+    text-decoration: none;
+}
+
+.nav-button-register {
+    display: inline-flex;
+    align-items: center;
+    padding: 8px 12px;
+    background-color: var(--color-primary-light); /* Bootstrap primary */
+    color: var(--color-dark);
+    border-radius: 4px;
+    text-decoration: none;
+    transition: background-color 0.5s ease;
+    font-weight: 500;
+}
+
+.nav-button-register:hover {
+    background-color: var(--color-primary-lighter);
+    color: var(--color-dark-light);
+    text-decoration: none;
+}
+
+.profile-button {
+    width: 40px;
+    height: 40px;
+    border-radius: 100%;
+    background-color: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border: none;
+    outline: none;
+    gap: 4px;
+}
+
+.profile-icon {
+    font-size: 40px;
+    color: var(--color-dark);
+}
+
+.profile-dropdown {
+    display: block;
+    position: absolute;
+    right: 0;
+    top: 100%; /* Place it below the trigger */
+    z-index: 1000;
+    margin-top: 0.5rem; /* replaces Bootstrap's mt-2 */
+    padding: .5rem .5rem;
+    background-color: var(--color-primary-lighter);
+    
+    border-radius: 0.375rem;
+    box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.1);
+    min-width: 180px;
+    list-style: none;
+    font-size: 1rem;
+
+    transition: all 0.2s ease;
+    opacity: 0;
+    transform: translateY(-10px) scaleY(.75);
+    transform-origin: top;
+    pointer-events: none;
+}
+
+.profile-dropdown.show {
+    max-height: 500px; /* adjust as needed */
+    opacity: 1;
+    transform: translateY(0) scaleY(1);
+    pointer-events: auto;
+}
+
+.profile-dropdown a.dropdown-item {
+    color: var(--color-dark);
+    text-decoration: none;
+    margin-left: 0; 
+}
+
+.profile-dropdown a.dropdown-item:hover {
+    color: var(--color-dark-light);
+}
+
+.pfp-preview {
+    width: 180px;
+    height: 180px;
+    border-radius: 100%;
+    object-fit: cover;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+}
+
+.pfp-preview:hover {
+    opacity: 0.8;
+}
+
+.pfp-upload-label {
+>>>>>>> 28edec13a97a88b688611b6a85ce50eab1b220be
+    display: inline-block;
+    cursor: pointer;
+}
+<<<<<<< HEAD
 .user-pulse-icon .pulse-dot {
     position: absolute;
     left: 50%;
@@ -219,3 +410,5 @@ h1:focus {
     background-color: var(--color-dark);
     color: var(--color-primary);
 }
+=======
+>>>>>>> 28edec13a97a88b688611b6a85ce50eab1b220be

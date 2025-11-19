@@ -8,18 +8,29 @@
     <link rel="stylesheet" href="@Assets["lib/bootstrap/dist/css/bootstrap.min.css"]" />
     <link rel="stylesheet" href="@Assets["app.css"]" />
     <link rel="stylesheet" href="@Assets["GymTracker.styles.css"]" />
+    <link rel="stylesheet" href="lib/bootstrap/dist/css/custom.css"> <!-- ADDED THIS LINE TO LINK CUSTOM CSS FILE -->
+    
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" /> <!-- THIS IS GOOGLE ICONS -->
     <ImportMap />
     <link rel="icon" type="image/png" href="favicon.png" />
     <HeadOutlet />
+
+    <!-- Cropper.js CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/cropperjs@1.5.13/dist/cropper.min.css" rel="stylesheet">
 </head>
 
 <body>
     <Routes />
+    <!-- geolocation shit -->
     <script src="@Assets["geolocation.js"]"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="@Assets["geolocation-map.js"]"></script>
+
+    <!-- cropper.js shit -->
+    <script src="https://cdn.jsdelivr.net/npm/cropperjs@1.5.13/dist/cropper.min.js"></script>
+    <script src="js/cropperInterop.js"></script>
+
     <script src="_framework/blazor.web.js"></script>
 </body>
 

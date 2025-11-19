@@ -1,10 +1,11 @@
 /*
-*   This file is for user-related operations
-*   such as creating a user, retrieving user details, etc.
-*   It interacts with the database using Entity Framework Core.
+*   This service handles all user-related operations:
+*   - Registering new users
+*   - Authenticating existing users (login)
+*   - Retrieving user information
+*   
+*   It interacts with the SQLite database through Entity Framework Core.
 */
-
-
 
 using GymTracker.Data;
 using GymTracker.Models;
@@ -21,25 +22,83 @@ namespace GymTracker.Services
             _context = context;
         }
 
-        // Method to create a new user
-        public async Task<User> CreateUserAsync(string username, string passwordHash)
+        // ✅ Register a new user (only if username doesn't exist)
+        public async Task<bool> RegisterAsync(string username, string password)
         {
+            // Validate input
+            if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
+                return false;
+
+            // Check if username already exists
+            bool exists = await _context.Users.AnyAsync(u => u.Username == username);
+            if (exists)
+                return false;
+
+            // Create and save new user with hashed password
             var user = new User
             {
                 Username = username,
-                PasswordHash = passwordHash
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword(password),
+                DateJoined = DateTime.Today
             };
 
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
+
+            return true;
+        }
+
+        // ✅ Authenticate user (login)
+        public async Task<User?> AuthenticateAsync(string username, string password)
+        {
+            // Validate input
+            if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
+                return null;
+
+            // Look for a user with the matching username
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
+
+            // Reject if username not found
+            if (user == null)
+                return null;
+
+            // Verify the password using BCrypt
+            bool passwordValid = BCrypt.Net.BCrypt.Verify(password, user.PasswordHash);
+            if (!passwordValid)
+                return null;
+
+            // ✅ Login success
             return user;
         }
 
-        // Method to retrieve a user by username
+        // ✅ Optional: Get a user by username (for profile, etc.)
         public async Task<User?> GetUserByUsernameAsync(string username)
         {
+            if (string.IsNullOrWhiteSpace(username))
+                return null;
+
             return await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
         }
-        
+
+        // Update profile image
+        public async Task<bool> UpdateProfileImageAsync(string username, byte[] imageData, string mimeType)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
+            if (user == null) return false;
+
+            user.ProfileImage = imageData;
+            user.ProfileImageMimeType = mimeType;
+
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> UpdateUserAsync(User user)
+        {
+            _context.Users.Update(user);
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
     }
 }
