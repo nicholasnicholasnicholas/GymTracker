@@ -5,10 +5,9 @@ namespace GymTracker.Models
 {
     public class Exercise
     {
-        public int Id { get; set; }
         public string Name { get; set; } = string.Empty;
 
         [NotMapped]
-        public Dictionary<Muscle, int> MusclesWorked { get; set; } = new();
+        public Dictionary<string, int> MusclesWorked { get; set; } = new();
     }
 }

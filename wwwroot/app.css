@@ -12,6 +12,40 @@
     --font-main: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 }
 
+/* Dark theme overrides
+   - Applies automatically when the OS prefers dark mode
+   - Also applies when `body.dark-mode` or `html[data-theme="dark"]` is present
+*/
+@media (prefers-color-scheme: dark) {
+    :root {
+        --color-primary: #00FF90;
+        --color-primary-light: #05422e; /* darker card accent */
+        --color-primary-lighter: rgb(14, 32, 27);
+        --color-shadow: #0f221a;
+        --color-light: #0b1412; /* card background (dark) */
+        --color-dark: #cbe7df; /* main text (light) */
+        --color-dark-light: #b7ffd6;
+        --color-bg: #1b332c; /* page background */
+        --font-main: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    }
+}
+
+html[data-theme="dark"], body.dark-mode {
+        --color-primary: #00FF90;
+        --color-primary-light: #05422e; /* darker card accent */
+        --color-primary-lighter: rgb(14, 32, 27);
+        --color-shadow: #0f221a;
+        --color-light: #0b1412; /* card background (dark) */
+        --color-dark: #cbe7df; /* main text (light) */
+        --color-dark-light: #b7ffd6;
+        --color-bg: #1b332c; /* page background */
+}
+
+/* Smooth transitions when toggling theme */
+html, body, .container-white, .container-light, .container-date, .btn, .profile-dropdown, .auth-card {
+    transition: background-color 180ms ease, color 180ms ease, box-shadow 180ms ease;
+}
+
 .color-primary {
     color: var(--color-primary);
 }
@@ -221,6 +255,10 @@ h1:focus {
     color: var(--color-primary);
 }
 
+.auth-card {
+    color: #00554E
+}
+
 /* login and register buttons */
 .nav-button-login {
     display: inline-flex;
@@ -332,3 +370,4 @@ h1:focus {
     display: inline-block;
     cursor: pointer;
 }
+
