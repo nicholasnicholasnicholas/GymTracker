@@ -10,12 +10,14 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
-// Add user session service for managing login state
+//  Required for login persistence
 builder.Services.AddScoped<UserSessionService>();
+builder.Services.AddScoped<UserService>();
+builder.Services.AddAuthorizationCore();
 
-// ✅ Ensure database uses correct absolute path
+// Configure SQLite DB
 var dbPath = Path.Combine(Directory.GetCurrentDirectory(), "GymTracker.db");
-Console.WriteLine($"💾 Using DB at: {dbPath}");
+Console.WriteLine($"Using DB at: {dbPath}");
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlite($"Data Source={dbPath}"));
@@ -29,7 +31,7 @@ builder.Services.AddBlazoredLocalStorage();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Configure HTTP Pipeline
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error", createScopeForErrors: true);
@@ -37,7 +39,6 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
 app.UseAntiforgery();
 
 app.MapStaticAssets();

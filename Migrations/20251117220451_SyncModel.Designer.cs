@@ -3,6 +3,7 @@ using System;
 using GymTracker.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GymTracker.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251117220451_SyncModel")]
+    partial class SyncModel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.10");
@@ -137,29 +140,6 @@ namespace GymTracker.Migrations
                             Title = "OC Marathon Running Event"
                         });
                 });
-            modelBuilder.HasAnnotation("ProductVersion", "9.0.10");
-
-            modelBuilder.Entity("GymTracker.Models.Set", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("Reps")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<double>("Weight")
-                        .HasColumnType("REAL");
-
-                    b.Property<int?>("WorkoutEntryId")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("WorkoutEntryId");
-
-                    b.ToTable("Sets");
-                });
 
             modelBuilder.Entity("GymTracker.Models.User", b =>
                 {
@@ -167,31 +147,7 @@ namespace GymTracker.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("Country")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime>("DateJoined")
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime>("DateOfBirth")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Nickname")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
                     b.Property<string>("PasswordHash")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<byte[]>("ProfileImage")
-                        .HasColumnType("BLOB");
-
-                    b.Property<string>("ProfileImageMimeType")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Pronouns")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
@@ -202,92 +158,6 @@ namespace GymTracker.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Users");
-                });
-
-            modelBuilder.Entity("GymTracker.Models.WorkoutEntry", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("ExerciseName")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("WorkoutSessionId")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("WorkoutSessionId");
-
-                    b.ToTable("WorkoutEntries");
-                });
-
-            modelBuilder.Entity("GymTracker.Models.WorkoutSession", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<DateTime>("Date")
-                        .HasColumnType("TEXT");
-
-                    b.Property<double>("Duration")
-                        .HasColumnType("REAL");
-
-                    b.Property<int?>("UserId")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("WorkoutSessions");
-                });
-
-            modelBuilder.Entity("GymTracker.Models.Set", b =>
-                {
-                    b.HasOne("GymTracker.Models.WorkoutEntry", "WorkoutEntry")
-                        .WithMany("Sets")
-                        .HasForeignKey("WorkoutEntryId");
-
-                    b.Navigation("WorkoutEntry");
-                });
-
-            modelBuilder.Entity("GymTracker.Models.WorkoutEntry", b =>
-                {
-                    b.HasOne("GymTracker.Models.WorkoutSession", "Session")
-                        .WithMany("WorkoutEntries")
-                        .HasForeignKey("WorkoutSessionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Session");
-                });
-
-            modelBuilder.Entity("GymTracker.Models.WorkoutSession", b =>
-                {
-                    b.HasOne("GymTracker.Models.User", "User")
-                        .WithMany("WorkoutSessions")
-                        .HasForeignKey("UserId");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("GymTracker.Models.User", b =>
-                {
-                    b.Navigation("WorkoutSessions");
-                });
-
-            modelBuilder.Entity("GymTracker.Models.WorkoutEntry", b =>
-                {
-                    b.Navigation("Sets");
-                });
-
-            modelBuilder.Entity("GymTracker.Models.WorkoutSession", b =>
-                {
-                    b.Navigation("WorkoutEntries");
                 });
 #pragma warning restore 612, 618
         }

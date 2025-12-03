@@ -51,12 +51,12 @@
     private string message = "";
 
     private async Task HandleLogin()
-    {
-        var user = await UserService.AuthenticateAsync(loginModel.Username, loginModel.Password);
+{
+    var user = await UserService.AuthenticateAsync(loginModel.Username, loginModel.Password);
 
         if (user != null)
         {
-            UserSessionService.Login(loginModel.Username);
+            await UserSessionService.Login(loginModel.Username);
             message = "Login successful! Redirecting...";
             await Task.Delay(1500);
             NavigationManager.NavigateTo("/");

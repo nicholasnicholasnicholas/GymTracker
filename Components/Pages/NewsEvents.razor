@@ -1,141 +1,113 @@
 @page "/newsevents"
+@using GymTracker.Models
+@using GymTracker.Services
+@using Microsoft.EntityFrameworkCore
+@inject ApplicationDbContext Db
+@inject UserSessionService UserSessionService
+@inject NavigationManager NavigationManager
 
-<h1 class="mb-4 text-center">Gym News & Events</h1>
+<div class="page-background">
+    <div class="content-container">
 
-<!-- Upcoming Events Section -->
-<h3 class="mt-4 mb-3 text-success"><i class="bi bi-calendar-event"></i> Upcoming Events</h3>
+        <h1>Gym News & Events</h1>
 
-@if (upcomingEvents.Count == 0)
-{
-    <p class="text-muted">No upcoming events right now. Check back soon!</p>
-}
-else
-{
-    <div class="row row-cols-1 row-cols-md-2 g-4 mb-4">
-        @foreach (var e in upcomingEvents)
+        @if (isLoading)
         {
-            <div class="col">
-                <div class="card shadow border-0 h-100">
-                    <div class="card-body">
-                        <h5 class="card-title">
-                            <i class="bi @e.Icon text-primary me-2"></i>@e.Title
-                        </h5>
-                        <span class="badge bg-@e.CategoryColor mb-2">@e.Category</span>
-                        <p>@e.Description</p>
-                        <p class="text-muted mb-1">
-                            <i class="bi bi-calendar3"></i> @e.Date.ToString("MMMM dd, yyyy")
-                        </p>
-                        <p class="text-muted">
-                            <i class="bi bi-geo-alt"></i> @e.Location
-                        </p>
-                        <a href="@e.Link" class="btn btn-outline-primary btn-sm" target="_blank">
-                            Learn More <i class="bi bi-box-arrow-up-right"></i>
-                        </a>
-                    </div>
-                </div>
-            </div>
+            <p>Loading events…</p>
         }
-    </div>
-}
-
-<!-- Collapsible Past Events -->
-<h3 class="mt-5 mb-3 text-secondary">
-    <button class="btn btn-link text-decoration-none" @onclick="TogglePastEvents">
-        <i class="bi @(showPastEvents ? "bi-caret-down-fill" : "bi-caret-right-fill")"></i>
-        Past Events
-    </button>
-</h3>
-
-@if (showPastEvents)
-{
-    @if (pastEvents.Count == 0)
-    {
-        <p class="text-muted">No past events yet.</p>
-    }
-    else
-    {
-        <div class="row row-cols-1 row-cols-md-2 g-4 mb-4">
-            @foreach (var e in pastEvents)
+        else
+        {
+            <!-- UPCOMING EVENTS -->
+            <h4 class="section-title">Upcoming Events</h4>
+            @if (upcomingEvents.Count == 0)
             {
-                <div class="col">
-                    <div class="card shadow-sm border-0 h-100 bg-light">
-                        <div class="card-body">
-                            <h5 class="card-title text-muted">
-                                <i class="bi @e.Icon me-2 text-secondary"></i>@e.Title
-                            </h5>
-                            <span class="badge bg-secondary mb-2">@e.Category</span>
-                            <p class="card-text">@e.Description</p>
-                            <p class="text-muted mb-1">
-                                <i class="bi bi-calendar3"></i> @e.Date.ToString("MMMM dd, yyyy")
-                            </p>
-                            <p class="text-muted">
-                                <i class="bi bi-geo-alt"></i> @e.Location
-                            </p>
+                <p class="text-muted">No upcoming events right now.</p>
+            }
+            else
+            {
+                <div class="event-grid">
+                    @foreach (var item in upcomingEvents)
+                    {
+                        <div class="event-card @(item.Date < DateTime.Now ? "past" : "")">
+
+                            <div class="event-date-badge">
+                                <span class="day">@item.Date.Day</span>
+                                <span class="month">@item.Date.ToString("MMM")</span>
+                            </div>
+
+                            <div class="event-info">
+                                <div class="event-title-section">
+                                    <h5>@item.Title</h5>
+                                </div>
+                                <p class="event-location">@item.Location</p>
+                                <p class="event-description">@item.Description</p>
+                                <a class="btn" href="@item.Link" target="_blank">More Info →</a>
+                            </div>
+
                         </div>
-                    </div>
+                    }
                 </div>
             }
-        </div>
-    }
-}
+
+            <!-- PAST EVENTS -->
+            <h4 class="section-title">Past Events</h4>
+            @if (pastEvents.Count == 0)
+            {
+                <p class="text-muted">No past events yet.</p>
+            }
+            else
+            {
+                <div class="event-grid">
+                    @foreach (var item in pastEvents)
+                    {
+                        <div class="event-card past">
+
+                            <div class="event-date-badge">
+                                <span class="day">@item.Date.Day</span>
+                                <span class="month">@item.Date.ToString("MMM")</span>
+                            </div>
+
+                            <div class="event-info">
+                                <div class="event-title-section">
+                                    <h5>@item.Title</h5>
+                                </div>
+                                <p class="event-location">@item.Location</p>
+                                <p class="event-description">@item.Description</p>
+                                <a class="btn" href="@item.Link" target="_blank">View Details →</a>
+                            </div>
+
+                        </div>
+                    }
+                </div>
+            }
+        }
+    </div>
+</div>
 
 @code {
-    private bool showPastEvents = false;
+    private bool isLoading = true;
+    private List<Event> upcomingEvents = new();
+    private List<Event> pastEvents = new();
 
-    private void TogglePastEvents()
+    protected override async Task OnInitializedAsync()
     {
-        showPastEvents = !showPastEvents;
+        await UserSessionService.LoadUserSessionAsync();
+
+        var events = await Db.Events.AsNoTracking().ToListAsync();
+        var now = DateTime.Now;
+
+        upcomingEvents = events
+            .Where(e => e.Date >= now)
+            .OrderBy(e => e.Date)
+            .ToList();
+
+        pastEvents = events
+            .Where(e => e.Date < now)
+            .OrderByDescending(e => e.Date)
+            .ToList();
+
+        isLoading = false;
     }
 
-    private List<EventItem> allEvents = new()
-    {
-        new EventItem
-        {
-            Title = "Charity Marathon 2025",
-            Description = "Join our annual 5K and 10K charity run to support local youth fitness programs.",
-            Date = new DateTime(2025, 11, 12),
-            Location = "Central Park, LA",
-            Category = "Run",
-            CategoryColor = "success",
-            Icon = "bi-heart-pulse",
-            Link = "https://example.com/marathon"
-        },
-        new EventItem
-        {
-            Title = "Strength Training Workshop",
-            Description = "Learn proper lifting techniques from certified trainers in this intensive workshop.",
-            Date = new DateTime(2025, 10, 20),
-            Location = "Downtown Gym Studio",
-            Category = "Workshop",
-            CategoryColor = "warning",
-            Icon = "bi-lightning-charge",
-            Link = "https://example.com/workshop"
-        },
-        new EventItem
-        {
-            Title = "Yoga and Recovery Session",
-            Description = "Free yoga for members! Focus on flexibility, breathing, and recovery.",
-            Date = new DateTime(2025, 8, 10),
-            Location = "Main Gym Hall",
-            Category = "Wellness",
-            CategoryColor = "info",
-            Icon = "bi-peace",
-            Link = "https://example.com/yoga"
-        }
-    };
-
-    private List<EventItem> upcomingEvents => allEvents.Where(e => e.Date >= DateTime.Now).ToList();
-    private List<EventItem> pastEvents => allEvents.Where(e => e.Date < DateTime.Now).ToList();
-
-    public class EventItem
-    {
-        public string Title { get; set; } = "";
-        public string Description { get; set; } = "";
-        public DateTime Date { get; set; }
-        public string Location { get; set; } = "";
-        public string Link { get; set; } = "";
-        public string Category { get; set; } = "";
-        public string CategoryColor { get; set; } = "primary";
-        public string Icon { get; set; } = "bi-calendar";
-    }
 }
+
