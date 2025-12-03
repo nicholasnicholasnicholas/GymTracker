@@ -152,3 +152,126 @@ h1 {
         margin-bottom: 10px;
     }
 }
+
+/* ===== DARK MODE OVERRIDES ===== */
+
+/* OS prefers dark */
+@media (prefers-color-scheme: dark) {
+    .page-background {
+        background: linear-gradient(180deg, #071712 0%, #052b21 100%);
+    }
+
+    .content-container {
+        /* a bit less "paper white" feel */
+        color: var(--color-dark);
+    }
+
+    /* Titles + headings use theme text color */
+    h1 {
+        color: var(--color-dark-light);
+    }
+
+    .section-title {
+        color: var(--color-dark-light);
+    }
+
+    /* Cards go dark but keep subtle elevation */
+    .event-card {
+        background: var(--color-light);
+        border-left-color: var(--color-primary);
+        box-shadow: 0 6px 22px rgba(0, 0, 0, 0.45);
+    }
+
+    /* Date badge pops with primary color */
+    .event-date-badge {
+        background: var(--color-primary);
+        color: #02110d;
+    }
+
+    .event-title-section h5 {
+        color: var(--color-dark-light);
+    }
+
+    .event-location {
+        color: var(--color-primary-light);
+    }
+
+    .event-description {
+        color: var(--color-dark);
+    }
+
+    /* Buttons outlined with primary green on dark bg */
+    .event-card a.btn,
+    .btn-success {
+        background-color: transparent;
+        color: var(--color-primary);
+        border-color: var(--color-primary);
+    }
+
+    .event-card a.btn:hover,
+    .btn-success:hover {
+        background-color: var(--color-primary);
+        color: #02110d;
+    }
+}
+
+/* Explicit app dark-mode toggles (html[data-theme="dark"] or body.dark-mode) */
+html[data-theme="dark"] .page-background,
+body.dark-mode .page-background {
+    background: linear-gradient(180deg, #071712 0%, #02110d 100%);
+}
+
+html[data-theme="dark"] h1,
+body.dark-mode h1 {
+    color: var(--color-dark-light);
+}
+
+html[data-theme="dark"] .section-title,
+body.dark-mode .section-title {
+    color: var(--color-dark-light);
+}
+
+html[data-theme="dark"] .event-card,
+body.dark-mode .event-card {
+    background: var(--color-light);
+    border-left-color: var(--color-primary);
+    box-shadow: 0 6px 22px rgba(0, 0, 0, 0.45);
+}
+
+html[data-theme="dark"] .event-date-badge,
+body.dark-mode .event-date-badge {
+    background: var(--color-primary);
+    color: #02110d;
+}
+
+html[data-theme="dark"] .event-title-section h5,
+body.dark-mode .event-title-section h5 {
+    color: var(--color-dark-light);
+}
+
+html[data-theme="dark"] .event-location,
+body.dark-mode .event-location {
+    color: var(--color-primary-light);
+}
+
+html[data-theme="dark"] .event-description,
+body.dark-mode .event-description {
+    color: var(--color-dark);
+}
+
+html[data-theme="dark"] .event-card a.btn,
+body.dark-mode .event-card a.btn,
+html[data-theme="dark"] .btn-success,
+body.dark-mode .btn-success {
+    background-color: transparent;
+    color: var(--color-primary);
+    border-color: var(--color-primary);
+}
+
+html[data-theme="dark"] .event-card a.btn:hover,
+body.dark-mode .event-card a.btn:hover,
+html[data-theme="dark"] .btn-success:hover,
+body.dark-mode .btn-success:hover {
+    background-color: var(--color-primary);
+    color: #02110d;
+}

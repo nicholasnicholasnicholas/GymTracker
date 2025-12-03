@@ -11,10 +11,6 @@
 
         <h1>Gym News & Events</h1>
 
-        <button class="btn btn-success mb-3" @onclick="GoToAddEvent">
-            Add Event
-        </button>
-
         @if (isLoading)
         {
             <p>Loading events…</p>
@@ -113,14 +109,5 @@
         isLoading = false;
     }
 
-    private void GoToAddEvent()
-    {
-        NavigationManager.NavigateTo("/newevents/add", true);
-    }
-
-    private void NavigateToLogin()
-    {
-        NavigationManager.NavigateTo("/login", true);
-    }
 }
 

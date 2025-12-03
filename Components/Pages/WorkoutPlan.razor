@@ -1,0 +1,282 @@
+@page "/workout-plan"
+@rendermode InteractiveServer
+
+<h3 class="page-title mb-3">Workout Plan</h3>
+<p class="text-muted mb-4">
+    Build your weekly workout plan or start from a preset template, then customize it.
+</p>
+
+<!-- Template selector -->
+<div class="d-flex flex-wrap gap-3 align-items-center mb-4">
+    <div class="flex-grow-1">
+        <label class="form-label fw-semibold">Quick templates</label>
+        <select class="form-select" @bind="selectedTemplate">
+            <option value="">Select a preset</option>
+            @foreach (var key in Templates.Keys)
+            {
+                <option value="@key">@key</option>
+            }
+        </select>
+        <div class="form-text">
+            Loading a template will replace your current plan.
+        </div>
+    </div>
+
+    <button class="btn btn-outline-primary"
+            @onclick="ApplyTemplate"
+            disabled="@string.IsNullOrEmpty(selectedTemplate)">
+        Load template
+    </button>
+</div>
+
+<div class="workout-plan-grid">
+    <div class="workout-form-card">
+        <h5 class="mb-3">Add Exercise</h5>
+
+        <EditForm Model="@currentExercise" OnValidSubmit="@AddExercise">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Day of Week</label>
+                <InputSelect class="form-select" @bind-Value="currentExercise.Day">
+                    <option value="">Select a day</option>
+                    @foreach (var day in DaysOfWeek)
+                    {
+                        <option value="@day">@day</option>
+                    }
+                </InputSelect>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Exercise Name</label>
+                <InputText class="form-control"
+                           placeholder="e.g. Bench Press"
+                           @bind-Value="currentExercise.Name" />
+            </div>
+
+            <div class="row">
+                <div class="col-6 mb-3">
+                    <label class="form-label fw-semibold">Sets</label>
+                    <InputNumber class="form-control"
+                                 @bind-Value="currentExercise.Sets" />
+                </div>
+                <div class="col-6 mb-3">
+                    <label class="form-label fw-semibold">Reps</label>
+                    <InputNumber class="form-control"
+                                 @bind-Value="currentExercise.Reps" />
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Muscle Group (optional)</label>
+                <InputText class="form-control"
+                           placeholder="e.g. Chest, Legs, Back"
+                           @bind-Value="currentExercise.MuscleGroup" />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Notes (optional)</label>
+                <InputTextArea class="form-control"
+                               rows="2"
+                               placeholder="e.g. Use dumbbells, tempo 3-1-1"
+                               @bind-Value="currentExercise.Notes" />
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100">
+                Add to Plan
+            </button>
+        </EditForm>
+    </div>
+
+    <div class="workout-table-card">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <h5 class="mb-0">Planned Exercises</h5>
+            @if (exercises.Any())
+            {
+                <button class="btn btn-sm btn-outline-danger" @onclick="ClearPlan">
+                    Clear Plan
+                </button>
+            }
+        </div>
+
+        @if (!exercises.Any())
+        {
+            <p class="text-muted mt-3">
+                No exercises yet. Add your first one using the form on the left or load a template above.
+            </p>
+        }
+        else
+        {
+            @foreach (var group in exercises.GroupBy(e => e.Day))
+            {
+                <h6 class="mt-3 mb-2 text-uppercase text-muted small">@group.Key</h6>
+                <div class="table-responsive">
+                    <table class="table table-sm align-middle workout-table">
+                        <thead>
+                            <tr>
+                                <th>Exercise</th>
+                                <th>Sets</th>
+                                <th>Reps</th>
+                                <th>Muscle</th>
+                                <th>Notes</th>
+                                <th style="width: 60px;"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var ex in group)
+                            {
+                                <tr>
+                                    <td>@ex.Name</td>
+                                    <td>@ex.Sets</td>
+                                    <td>@ex.Reps</td>
+                                    <td>@ex.MuscleGroup</td>
+                                    <td>@ex.Notes</td>
+                                    <td class="text-end">
+                                        <button class="btn btn-sm btn-outline-secondary"
+                                                @onclick="() => RemoveExercise(ex)">
+                                            Remove
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        }
+    </div>
+</div>
+
+@code {
+    private List<WorkoutExercise> exercises = new();
+    private WorkoutExercise currentExercise = new();
+    private string? selectedTemplate;
+
+    private static readonly string[] DaysOfWeek = new[]
+    {
+        "Monday", "Tuesday", "Wednesday", "Thursday",
+        "Friday", "Saturday", "Sunday"
+    };
+
+    // Preset templates
+    private Dictionary<string, List<WorkoutExercise>> Templates => new()
+    {
+        ["Push / Pull / Legs (3-day)"] = new List<WorkoutExercise>
+        {
+            new() { Day = "Monday", Name = "Barbell Bench Press", Sets = 4, Reps = 8, MuscleGroup = "Chest", },
+            new() { Day = "Monday", Name = "Barbell Incline Bench Press", Sets = 3, Reps = 8, MuscleGroup = "Chest", Notes = "Incline sub 45 degrees" },
+            new() { Day = "Monday", Name = "Machine Chest Flys", Sets = 3, Reps = 12, MuscleGroup = "Chest", },
+            new() { Day = "Monday", Name = "Dumbell Shoulder Press", Sets = 3, Reps = 10, MuscleGroup = "Shoulders", },
+            new() { Day = "Monday", Name = "Cable Lateral Raises", Sets = 3, Reps = 12, MuscleGroup = "Shoulders", },
+            new() { Day = "Monday", Name = "Tricep Dips", Sets = 3, Reps = 12, MuscleGroup = "Triceps", Notes = "Bodyweight or weighted" },
+
+            new() { Day = "Wednesday", Name = "Pull-ups", Sets = 4, Reps = 6, MuscleGroup = "Back" },
+            new() { Day = "Wednesday", Name = "Barbell Row", Sets = 4, Reps = 8, MuscleGroup = "Back" },
+            new() { Day = "Wednesday", Name = "Bicep Curls", Sets = 3, Reps = 12, MuscleGroup = "Biceps" },
+
+            new() { Day = "Friday", Name = "Back Squat", Sets = 4, Reps = 8, MuscleGroup = "Legs" },
+            new() { Day = "Friday", Name = "Romanian Deadlift", Sets = 3, Reps = 10, MuscleGroup = "Hamstrings" },
+            new() { Day = "Friday", Name = "Calf Raises", Sets = 4, Reps = 15, MuscleGroup = "Calves" }
+        },
+
+        ["Full Body (3x per week)"] = new List<WorkoutExercise>
+        {
+            new() { Day = "Monday", Name = "Back Squat", Sets = 3, Reps = 5, MuscleGroup = "Legs" },
+            new() { Day = "Monday", Name = "Bench Press", Sets = 3, Reps = 5, MuscleGroup = "Chest" },
+            new() { Day = "Monday", Name = "Barbell Row", Sets = 3, Reps = 8, MuscleGroup = "Back" },
+
+            new() { Day = "Wednesday", Name = "Front Squat", Sets = 3, Reps = 5, MuscleGroup = "Legs" },
+            new() { Day = "Wednesday", Name = "Overhead Press", Sets = 3, Reps = 5, MuscleGroup = "Shoulders" },
+            new() { Day = "Wednesday", Name = "Lat Pulldown", Sets = 3, Reps = 10, MuscleGroup = "Back" },
+
+            new() { Day = "Friday", Name = "Deadlift", Sets = 3, Reps = 5, MuscleGroup = "Posterior Chain" },
+            new() { Day = "Friday", Name = "Incline Dumbbell Press", Sets = 3, Reps = 8, MuscleGroup = "Chest" },
+            new() { Day = "Friday", Name = "Seated Row", Sets = 3, Reps = 10, MuscleGroup = "Back" }
+        },
+
+        ["Upper / Lower (4-day)"] = new List<WorkoutExercise>
+        {
+            new() { Day = "Monday", Name = "Bench Press", Sets = 4, Reps = 6, MuscleGroup = "Chest" },
+            new() { Day = "Monday", Name = "Pull-ups", Sets = 4, Reps = 6, MuscleGroup = "Back" },
+            new() { Day = "Monday", Name = "Lateral Raises", Sets = 3, Reps = 12, MuscleGroup = "Shoulders" },
+
+            new() { Day = "Tuesday", Name = "Back Squat", Sets = 4, Reps = 8, MuscleGroup = "Legs" },
+            new() { Day = "Tuesday", Name = "Leg Press", Sets = 3, Reps = 10, MuscleGroup = "Legs" },
+            new() { Day = "Tuesday", Name = "Leg Curls", Sets = 3, Reps = 12, MuscleGroup = "Hamstrings" },
+
+            new() { Day = "Thursday", Name = "Incline Bench", Sets = 4, Reps = 8, MuscleGroup = "Chest" },
+            new() { Day = "Thursday", Name = "Barbell Row", Sets = 4, Reps = 8, MuscleGroup = "Back" },
+            new() { Day = "Thursday", Name = "Face Pulls", Sets = 3, Reps = 15, MuscleGroup = "Rear Delts" },
+
+            new() { Day = "Friday", Name = "Deadlift", Sets = 3, Reps = 5, MuscleGroup = "Posterior Chain" },
+            new() { Day = "Friday", Name = "Walking Lunges", Sets = 3, Reps = 12, MuscleGroup = "Legs", Notes = "Per leg" },
+            new() { Day = "Friday", Name = "Calf Raises", Sets = 4, Reps = 15, MuscleGroup = "Calves" }
+        }
+    };
+
+    private void ApplyTemplate()
+    {
+        if (string.IsNullOrEmpty(selectedTemplate))
+            return;
+
+        if (!Templates.TryGetValue(selectedTemplate, out var template))
+            return;
+
+        // clone list so editing doesn't mutate template definitions
+        exercises = template.Select(e => new WorkoutExercise
+        {
+            Day = e.Day,
+            Name = e.Name,
+            Sets = e.Sets,
+            Reps = e.Reps,
+            MuscleGroup = e.MuscleGroup,
+            Notes = e.Notes
+        }).ToList();
+
+        // reset current form
+        currentExercise = new WorkoutExercise();
+    }
+
+    private void AddExercise()
+    {
+        if (string.IsNullOrWhiteSpace(currentExercise.Day) ||
+            string.IsNullOrWhiteSpace(currentExercise.Name))
+        {
+            return;
+        }
+
+        exercises.Add(new WorkoutExercise
+        {
+            Day = currentExercise.Day,
+            Name = currentExercise.Name,
+            Sets = currentExercise.Sets,
+            Reps = currentExercise.Reps,
+            MuscleGroup = currentExercise.MuscleGroup,
+            Notes = currentExercise.Notes
+        });
+
+        currentExercise = new WorkoutExercise();
+    }
+
+    private void RemoveExercise(WorkoutExercise ex)
+    {
+        exercises.Remove(ex);
+    }
+
+    private void ClearPlan()
+    {
+        exercises.Clear();
+        currentExercise = new WorkoutExercise();
+    }
+
+    public class WorkoutExercise
+    {
+        public string Day { get; set; } = "";
+        public string Name { get; set; } = "";
+        public int Sets { get; set; } = 3;
+        public int Reps { get; set; } = 8;
+        public string MuscleGroup { get; set; } = "";
+        public string Notes { get; set; } = "";
+    }
+}

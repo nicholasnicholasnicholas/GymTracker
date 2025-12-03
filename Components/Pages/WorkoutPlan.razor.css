@@ -1,0 +1,214 @@
+.page-title {
+    font-weight: 650;
+    letter-spacing: 0.03em;
+    color: var(--color-dark);
+}
+
+/* Two-column layout on desktop */
+.workout-plan-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.6fr);
+    gap: 1.5rem;
+}
+
+/* Cards for form + table */
+.workout-form-card,
+.workout-table-card {
+    background-color: var(--color-light);
+    border-radius: 1rem;
+    padding: 1.5rem;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.06);
+}
+
+/* Scrollable table card */
+.workout-table-card {
+    max-height: 70vh;
+    overflow: auto;
+}
+
+/* Template select + day select styling */
+.form-select,
+.workout-form-card .form-select {
+    font-size: 0.9rem;
+    background-color: var(--color-primary-lighter);
+    color: var(--color-dark);
+    border: 1px solid var(--color-primary-light);
+    border-radius: 0.75rem;
+}
+
+/* Make selects feel clickable */
+.form-select:focus {
+    box-shadow: 0 0 0 0.12rem var(--color-primary-light);
+    border-color: var(--color-primary);
+}
+
+/* Table styling */
+.workout-table {
+    margin-bottom: 0;
+}
+
+.workout-table th {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    background-color: var(--color-primary-lighter);
+    color: var(--color-dark);
+    border-bottom: 1px solid var(--color-shadow);
+}
+
+.workout-table td {
+    font-size: 0.9rem;
+    vertical-align: middle;
+    background-color: transparent;
+    color: var(--color-dark);
+}
+
+/* Zebra rows for readability */
+.workout-table tbody tr:nth-child(odd) {
+    background-color: var(--color-shadow);
+}
+
+.workout-table tbody tr:hover {
+    background-color: var(--color-primary-light);
+}
+
+/* “Clear Plan” + small buttons look nicer with rounded corners */
+.workout-table-card .btn,
+.workout-form-card .btn {
+    border-radius: 999px;
+}
+
+
+/* ============================================================
+   DARK MODE OVERRIDES
+   - Applies when OS prefers dark OR your app forces dark theme
+   ============================================================ */
+@media (prefers-color-scheme: dark) {
+
+    /* Page Title */
+    .page-title {
+        color: var(--color-dark-light);
+    }
+
+    /* Cards */
+    .workout-form-card,
+    .workout-table-card {
+        background-color: var(--color-light); /* dark card */
+        color: var(--color-dark-light);
+        box-shadow: 0 4px 22px rgba(0, 0, 0, 0.45);
+    }
+
+    /* Selects */
+    .form-select,
+    .workout-form-card .form-select {
+        background-color: var(--color-primary-lighter);
+        color: var(--color-dark-light);
+        border-color: var(--color-primary);
+    }
+
+    .form-select:focus {
+        background-color: var(--color-primary-light);
+        border-color: var(--color-primary);
+        box-shadow: 0 0 0 0.15rem rgba(0, 255, 144, 0.35);
+    }
+
+    /* Table text */
+    .workout-table th {
+        background-color: var(--color-primary-lighter);
+        color: var(--color-dark-light);
+        border-bottom-color: var(--color-primary-light);
+    }
+
+    .workout-table td {
+        color: var(--color-dark-light) !important;
+    }
+
+    /* Zebra rows */
+    .workout-table tbody tr:nth-child(odd) {
+        background-color: #0d231c;
+    }
+
+    .workout-table tbody tr:hover {
+        background-color: #123127;
+    }
+
+    /* Muted text fixes */
+    p.text-muted,
+    h6.text-muted,
+    .form-text {
+        color: var(--color-dark-light) !important;
+        opacity: 1 !important;
+    }
+}
+
+
+/* ============================================================
+   App-Level Dark Mode (html[data-theme="dark"], body.dark-mode)
+   ============================================================ */
+html[data-theme="dark"] .page-title,
+body.dark-mode .page-title {
+    color: var(--color-dark-light);
+}
+
+html[data-theme="dark"] .workout-form-card,
+body.dark-mode .workout-form-card,
+html[data-theme="dark"] .workout-table-card,
+body.dark-mode .workout-table-card {
+    background-color: var(--color-light);
+    color: var(--color-dark-light);
+    box-shadow: 0 4px 22px rgba(0, 0, 0, 0.45);
+}
+
+html[data-theme="dark"] .form-select,
+body.dark-mode .form-select {
+    background-color: var(--color-primary-lighter);
+    color: var(--color-dark-light);
+    border-color: var(--color-primary);
+}
+
+html[data-theme="dark"] .form-select:focus,
+body.dark-mode .form-select:focus {
+    background-color: var(--color-primary-light);
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 0.15rem rgba(0, 255, 144, 0.35);
+}
+
+html[data-theme="dark"] .workout-table th,
+body.dark-mode .workout-table th {
+    background-color: var(--color-primary-lighter);
+    color: var(--color-dark-light);
+}
+
+html[data-theme="dark"] .workout-table td,
+body.dark-mode .workout-table td {
+    color: var(--color-dark-light);
+}
+
+html[data-theme="dark"] .workout-table tbody tr:nth-child(odd),
+body.dark-mode .workout-table tbody tr:nth-child(odd) {
+    background-color: #0d231c;
+}
+
+html[data-theme="dark"] .workout-table tbody tr:hover,
+body.dark-mode .workout-table tbody tr:hover {
+    background-color: #123127;
+}
+
+html[data-theme="dark"] p.text-muted,
+body.dark-mode p.text-muted,
+html[data-theme="dark"] h6.text-muted,
+body.dark-mode h6.text-muted,
+html[data-theme="dark"] .form-text,
+body.dark-mode .form-text {
+    color: var(--color-dark-light) !important;
+    opacity: 1 !important;
+}
+
+
+
+/* Responsive: stack on smaller screens */
+@media (max-width: 768px) {
+    .workout-plan-grid {
+        grid-template-columns: 1fr;
+    }
+}

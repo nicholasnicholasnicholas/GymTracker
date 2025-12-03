@@ -15,7 +15,7 @@ namespace GymTracker.Data
         public DbSet<WorkoutSession> WorkoutSessions { get; set; }
         public DbSet<WorkoutEntry> WorkoutEntries { get; set; }
         public DbSet<Set> Sets { get; set; }
-        //public DbSet<Event> Events { get; set; }
+        public DbSet<Event> Events { get; set; }
 
  protected override void OnModelCreating(ModelBuilder builder)
         {
