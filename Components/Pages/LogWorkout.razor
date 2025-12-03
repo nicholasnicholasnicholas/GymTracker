@@ -1,5 +1,6 @@
 @page "/logworkout"
 @rendermode InteractiveServer
+@inject IJSRuntime JS
 
 @using System.Timers
 
@@ -10,6 +11,7 @@
 
 @inject Blazored.LocalStorage.ILocalStorageService LocalStorage
 @inject UserSessionService UserSessionService
+@inject UserService UserService
 
 <h1 class="mb-4 text-center">Journal</h1>
 
@@ -19,7 +21,14 @@
         <!-- Date -->
         <div class="p-3 flex-fill" style="min-width: 150px;">
             <label class="form-label fs-4"><strong>Date</strong></label>
-            <input class="form-control fs-5 container-date" type="date" @bind="workoutDate" @bind:after="OnDateChanged"/>
+            <div class="d-flex gap-2">
+                <input class="form-control fs-5 container-date" type="date" @bind="workoutDate" @bind:after="OnDateChanged"/>
+
+                <!-- Old debug save stuff
+                <button class="btn btn-outline-primary" @onclick="LoadSessionFromServer">Load</button>
+                <button class="btn btn-outline-success" @onclick="SaveSessionToServer">Save</button>
+                -->
+            </div>
         </div>
 
         <!-- Workout Stopwatch -->
@@ -92,6 +101,26 @@
         }
     }
 
+    private void OnSetWeightChanged(Set set, ChangeEventArgs e)
+    {
+        var s = Convert.ToString(e.Value);
+        if (double.TryParse(s, out var val))
+        {
+            set.Weight = val;
+        }
+        ScheduleAutoSave();
+    }
+
+    private void OnSetRepsChanged(Set set, ChangeEventArgs e)
+    {
+        var s = Convert.ToString(e.Value);
+        if (int.TryParse(s, out var val))
+        {
+            set.Reps = val;
+        }
+        ScheduleAutoSave();
+    }
+
     private void UpdateWorkoutDuration(object? sender, ElapsedEventArgs e)
     {
         InvokeAsync(StateHasChanged); // Just refresh UI
@@ -108,221 +137,375 @@
 
 
 <!-- Journal NEW --> 
-@if (currentSession != null)
-{
-    <div class="container-fluid container-white px-3 py-3 mt-3 rounded">
-        <label class="form-label fs-4"><strong>Journal</strong></label>
+<div class="container-fluid container-white px-3 py-3 mt-3 rounded">
+    <label class="form-label fs-4"><strong>Journal</strong></label>
 
-        <!-- Exercise -->
-        @if (currentSession.WorkoutEntries.Count == 0)
-        {
-            <p class="text-muted">No exercises logged for this date.</p>
-        }
+    @*Is there a current session?*@
+    @if (currentSession != null) {
+        @*Show each workout entry*@
+            @for (int i = 0; i < currentSession.WorkoutEntries.Count; i++) {   
+            var currentEntry = currentSession.WorkoutEntries[i];
+            var currentIndex = i;
+            var isCollapsed = currentEntry.IsCollapsed;
 
-        @for (int i = 0; i < currentSession.WorkoutEntries.Count; i++)
-        {
-            var entry = currentSession.WorkoutEntries[i];
+            @*Exercise card*@
+            <div class="exercise-card mb-2" @key="currentEntry.IdClient">
+                <div class="exercise-card-header">
+                    @*Caret*@
+                    <button class="btn caret" @onclick="() => CollapseExercise(currentEntry)">
+                        @(isCollapsed ? "►" : "▼")
+                    </button>
 
-            <div class="card mb-2">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <strong>@entry.ExerciseName</strong>
-                    <button class="btn btn-sm btn-outline-secondary" @onclick="() => ToggleExercise(i)">
-                        @(IsExpanded(i) ? "Hide" : "Show")
+                    @*Exercise name*@
+                    <strong>@currentEntry.ExerciseName</strong>
+
+                    @*Remove exercise button*@
+                    <button type="button" 
+                        class="btn exercise-remove ms-auto"
+                        @onclick="() => RemoveExercise(currentEntry)">
+                    ×
                     </button>
                 </div>
 
-                @if (IsExpanded(i))
-                {
-                    <div class="card-body">
-                        @for (int j = 0; j < entry.Sets.Count; j++)
-                        {
-                            var set = entry.Sets[j];
-                            <div class="d-flex gap-2 mb-2">
-                                <input type="number" class="form-control" placeholder="Weight (lbs)" @bind="set.Weight" />
-                                <input type="number" class="form-control" placeholder="Reps" @bind="set.Reps" />
+                @*Exercise Sets*@
+                <div id="exercise-body-@currentEntry.IdClient" class="exercise-card-body @(isCollapsed ? "hidden" : "")">
+                    @for (int j = 0; j < currentEntry.Sets.Count; j++) {
+                        var set = currentEntry.Sets[j];
+                        var currentJndex = j; 
+                        
+                        <div @key="set" class="row g-1 exercise-card-set">
+                            @*Set*@
+                            <div class="col-4 exercise-card-set-label">
+                                @*Remove Button*@
+                                <button type="button" 
+                                    class="btn set-remove" 
+                                    @onclick="() => RemoveSet(currentEntry, currentJndex)"
+                                    disabled="@(currentEntry.Sets.Count <= 1)">
+                                    ×
+                                    </button>
+
+                                @*Label*@
+                                Set @(j+1)
                             </div>
-                        }
 
-                        <button class="btn btn-sm btn-outline-success" @onclick="() => AddSet(entry)">+ Add Set</button>
+                            @*Weight*@
+                            <div class="col-4 set">
+                                <div class="input-wrapper">
+                                    <input type="number" class="form-control form-control" placeholder="0" value="@set.Weight" @oninput="@(e => OnSetWeightChanged(set, e))" />
+                                    <span class="input-group-text">lbs</span>
+                                </div>
+                            </div>
+
+                            @*Reps*@
+                            <div class="col-4 set">
+                                <div class="input-wrapper">
+                                    <input type="number" class="form-control" placeholder="0" value="@set.Reps" @oninput="@(e => OnSetRepsChanged(set, e))" />
+                                    <span class="input-group-text">Reps</span>
+                                </div>
+                            </div>
+                        </div>
+                    }
+
+                    @*Add Set*@
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn add-set d-flex align-items-center gap-2 fs-5 w-100" @onclick="() => AddSet(currentEntry)">
+                            <span>+</span>
+                            <strong>Add Set</strong>
+                        </button>
                     </div>
-                }
-            </div>
+                </div>
+            </div>  
         }
-
 
         <!-- Add excercise -->
         <div class="d-flex gap-2">
-            <select class="form-select" @bind="newExerciseName">
-                <option value="">Select Exercise</option>
-                @foreach (var exercise in ExerciseLibrary.All)
-                {
-                    <option value="@exercise.Name">@exercise.Name</option>
-                }
-            </select>
-
-            <button class="btn button-success flex-fill d-flex justify-content-between align-items-center fs-5" @onclick="AddExercise">
-                <div class="d-flex align-items-center gap-2 fs-5">
-                    <span>+</span>
-                    <strong>Add</strong>
-                </div>
-            </button>
-        </div>
-    </div>
-}
-else
-{
-    <p>Loading workout session...</p>
-}
-
-@*
-@if (currentSession != null)
-{
-    <div class="container-fluid container-white px-3 py-3 mt-3 rounded">
-        <label class="form-label fs-4"><strong>Journal for @workoutDate.ToShortDateString()</strong></label>
-
-        @if (currentSession.WorkoutEntries.Count == 0)
-        {
-            <p class="text-muted">No exercises logged for this date.</p>
-        }
-
-        @for (int i = 0; i < currentSession.WorkoutEntries.Count; i++)
-        {
-            var entry = currentSession.WorkoutEntries[i];
-
-            <div class="card mb-3">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <strong>@entry.ExerciseName</strong>
-                    <button class="btn btn-sm btn-outline-secondary" @onclick="() => ToggleExercise(i)">
-                        @(IsExpanded(i) ? "Hide" : "Show")
-                    </button>
-                </div>
-
-                @if (IsExpanded(i))
-                {
-                    <div class="card-body">
-                        @for (int j = 0; j < entry.Sets.Count; j++)
-                        {
-                            var set = entry.Sets[j];
-                            <div class="d-flex gap-2 mb-2">
-                                <input type="number" class="form-control" placeholder="Weight (lbs)" @bind="set.Weight" />
-                                <input type="number" class="form-control" placeholder="Reps" @bind="set.Reps" />
-                            </div>
-                        }
-
-                        <button class="btn btn-sm btn-outline-success" @onclick="() => AddSet(entry)">+ Add Set</button>
+            <select class="form-select add-exercise" @bind="newExerciseName" @bind:after="AddExercise">
+                <option value="" disabled selected>
+                    <div class="d-flex align-items-center gap-2 fs-5">
+                        <span>+</span>
+                        <strong>Add Exercise</strong>
                     </div>
-                }
-            </div>
-        }
-
-        <!-- Add New Exercise -->
-        <div class="d-flex gap-2 mt-3">
-            <select class="form-select" @bind="newExerciseName">
-                <option value="">-- Select Exercise --</option>
-                @foreach (var exercise in ExerciseLibrary.All)
+                </option>
+                @foreach (var exercise in ExerciseLibrary.Exercises)
                 {
                     <option value="@exercise.Name">@exercise.Name</option>
                 }
             </select>
-
-            <button class="btn btn-primary" @onclick="AddExercise" disabled="@string.IsNullOrWhiteSpace(newExerciseName)">
-                + Add Exercise
-            </button>
         </div>
-
-        <div class="mt-3">
-            <button class="btn btn-success" @onclick="SaveSession">💾 Save</button>
-        </div>
-    </div>
-}
-else
-{
-    <p>Loading workout session...</p>
-}
-*@
+    }
+    else {
+        <p>Loading workout session...</p>
+    }
+</div>
 
 @code {
     private WorkoutSession? currentSession;
+
+    //Add a new exercise
     private string? newExerciseName;
 
-    private readonly Dictionary<int, bool> expandedEntries = new();
-    private bool _hasRendered = false;
-
-    // 🔄 Load session only once after client-side render is ready
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            _hasRendered = true;
-            await LoadSessionFromLocal();
-            StateHasChanged();
-        }
-    }
-
-    // 📅 Load session when the date changes
-    private async Task OnDateChanged()
-    {
-        if (!_hasRendered) return;
-        await LoadSessionFromLocal();
-    }
-
-    // 💾 Load session from browser local storage
-    private async Task LoadSessionFromLocal()
-    {
-        var key = $"workout_{workoutDate:yyyyMMdd}";
-        var saved = await LocalStorage.GetItemAsync<WorkoutSession>(key);
-
-        currentSession = saved ?? new WorkoutSession { Date = workoutDate };
-    }
-
-    // 💾 Save session to browser local storage
-    private async Task SaveSessionToLocal()
-    {
-        if (currentSession == null) return;
-
-        var key = $"workout_{workoutDate:yyyyMMdd}";
-        await LocalStorage.SetItemAsync(key, currentSession);
-        Console.WriteLine($"💾 Saved session for {workoutDate:d}");
-    }
-
-    // 📂 Toggle visibility of exercise sets
-    private void ToggleExercise(int index)
-    {
-        expandedEntries[index] = !IsExpanded(index);
-    }
-
-    private bool IsExpanded(int index)
-    {
-        return !expandedEntries.ContainsKey(index) || expandedEntries[index];
-    }
-
-    // ➕ Add a new set to an exercise
-    private async void AddSet(WorkoutEntry entry)
-    {
-        entry.Sets.Add(new Set());
-        await SaveSessionToLocal(); // Auto-save
-    }
-
-    // ➕ Add a new exercise
-    private async void AddExercise()
+    private void AddExercise()
     {
         if (string.IsNullOrWhiteSpace(newExerciseName)) return;
 
         currentSession ??= new WorkoutSession { Date = workoutDate };
 
-        currentSession.WorkoutEntries.Add(new WorkoutEntry
-        {
-            ExerciseName = newExerciseName,
-            Sets = new List<Set> { new Set() }
-        });
+        currentSession.WorkoutEntries.Add(
+            new WorkoutEntry 
+            {
+                ExerciseName = newExerciseName,
+                Sets = new List<Set> { new Set() }
+            }
+        );
 
-        newExerciseName = string.Empty;
-        await SaveSessionToLocal(); // Auto-save
+        newExerciseName = "";
+        return;
     }
 
-    // 💾 Manual Save button
-    private async Task SaveSession()
+    private void RemoveExercise(WorkoutEntry entryToRemove)
     {
-        await SaveSessionToLocal();
+        if (currentSession == null || entryToRemove == null)
+            return;
+
+        currentSession.WorkoutEntries.Remove(entryToRemove);
+        ScheduleAutoSave();
+    }
+
+    // Hide/Show Exercise (use element IDs + JS helpers instead of ElementReference capture)
+    private bool _hasRendered = false;
+
+    private async Task CollapseExercise(WorkoutEntry entryToCollapse)
+    {
+        entryToCollapse.IsCollapsed = !entryToCollapse.IsCollapsed;
+
+          await FixMaxHeightById(entryToCollapse.IdClient, !entryToCollapse.IsCollapsed, 0);
+        await FixMaxHeightById(entryToCollapse.IdClient, !entryToCollapse.IsCollapsed, 0);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!_hasRendered)
+        {
+            _hasRendered = true;
+
+            // Automatically load the session for the selected date when the page first renders
+            await LoadSessionFromServer();
+        }
+    }
+
+    private async Task FixMaxHeightById(Guid id, bool show, int offset)
+    {
+        var elementId = $"exercise-body-{id}";
+        var height = await JS.InvokeAsync<int>("getScrollHeightById", elementId);
+
+        if (show)
+        {
+            await JS.InvokeVoidAsync("setMaxHeightById", elementId, height + 8 + offset);
+        }
+        else
+        {
+            await JS.InvokeVoidAsync("setMaxHeightById", elementId, 0);
+        }
+    }
+
+    // Add set to exercise — recalc height after DOM updates
+    private async Task AddSet(WorkoutEntry currentEntry)
+    {
+        currentEntry.Sets.Add(new Set());
+
+        // Ensure the render happens so the new element is present in the DOM
+        await InvokeAsync(StateHasChanged);
+        await Task.Yield();
+
+        // Recompute max-height for this entry so the collapse container fits
+        await FixMaxHeightById(currentEntry.IdClient, !currentEntry.IsCollapsed, 0);
+        ScheduleAutoSave();
+    }
+
+    // Remove set from exercise — recalc height after DOM updates
+    private async Task RemoveSet(WorkoutEntry currentEntry, int index)
+    {
+        if (index >= 0 && index < currentEntry.Sets.Count)
+        {
+            currentEntry.Sets.RemoveAt(index);
+
+            // Update the UI and then recompute height
+            await InvokeAsync(StateHasChanged);
+            await Task.Yield();
+
+            await FixMaxHeightById(currentEntry.IdClient, !currentEntry.IsCollapsed, 0);
+            ScheduleAutoSave();
+        }
+    }
+
+    // --- Auto-save support (debounced) ---
+    private System.Timers.Timer? _autoSaveTimer;
+    private readonly int _autoSaveIntervalMs = 2000; // 2s debounce
+    private bool _autoSavePending = false;
+
+    private void ScheduleAutoSave()
+    {
+        try
+        {
+            if (_autoSaveTimer == null)
+            {
+                _autoSaveTimer = new System.Timers.Timer(_autoSaveIntervalMs);
+                _autoSaveTimer.AutoReset = false;
+                _autoSaveTimer.Elapsed += async (s, e) =>
+                {
+                    // Ensure we're on the renderer thread
+                    await InvokeAsync(async () =>
+                    {
+                        await SaveSessionToServer();
+                        _autoSavePending = false;
+                    });
+                };
+            }
+
+            _autoSavePending = true;
+            _autoSaveTimer.Stop();
+            _autoSaveTimer.Interval = _autoSaveIntervalMs;
+            _autoSaveTimer.Start();
+        }
+        catch
+        {
+            // swallow - scheduling auto-save should not crash the UI
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        try
+        {
+            if (_autoSaveTimer != null)
+            {
+                _autoSaveTimer.Stop();
+            }
+
+            if (_autoSavePending)
+            {
+                await SaveSessionToServer();
+            }
+
+            _autoSaveTimer?.Dispose();
+        }
+        catch
+        {
+            // ignore
+        }
+    }
+
+    // Load a workout session on date changed
+    private async Task OnDateChanged()
+    {
+        // Try to load a server-side session for the selected date if user is logged in.
+        if (UserSessionService.IsLoggedIn)
+        {
+            await LoadSessionFromServer();
+        }
+        else
+        {
+            // Fallback to a new session placeholder when not logged in
+            currentSession = new WorkoutSession { Date = workoutDate };
+        }
+    }
+
+    private async Task LoadSessionFromServer()
+    {
+        if (!UserSessionService.IsLoggedIn)
+        {
+            // Not logged in — create a blank session for the date
+            currentSession = new WorkoutSession { Date = workoutDate };
+            await InvokeAsync(StateHasChanged);
+            return;
+        }
+
+        var username = UserSessionService.Username;
+        var session = await UserService.GetWorkoutSessionByDateAsync(username, workoutDate);
+
+        if (session == null)
+        {
+            // No saved session for the date — create a fresh one
+            currentSession = new WorkoutSession { Date = workoutDate };
+        }
+        else
+        {
+            currentSession = session;
+        }
+
+        // Allow the component to render the loaded entries, then fix heights
+        await InvokeAsync(StateHasChanged);
+        await Task.Yield();
+
+        if (currentSession != null)
+        {
+            foreach (var entry in currentSession.WorkoutEntries)
+            {
+                await FixMaxHeightById(entry.IdClient, !entry.IsCollapsed, 0);
+            }
+        }
+    }
+
+    private async Task SaveSessionToServer()
+    {
+        if (currentSession == null) return;
+
+        if (!UserSessionService.IsLoggedIn)
+        {
+            // If not logged in, we could save to LocalStorage — for demo, just log
+            var key = $"workout_{workoutDate:yyyyMMdd}";
+            await LocalStorage.SetItemAsync(key, currentSession);
+            Console.WriteLine($"Saved session to LocalStorage for {workoutDate:d}");
+            return;
+        }
+
+        var username = UserSessionService.Username;
+        var ok = await UserService.SaveWorkoutSessionAsync(username, currentSession);
+        if (ok)
+            Console.WriteLine($"Saved session for {username} on {workoutDate:d}");
+        else
+            Console.WriteLine("Failed to save session (user missing?)");
+    }
+}
+
+<div class="container-fluid container-white px-3 py-3 mt-3 rounded">
+    <label class="form-label fs-4"><strong>Summary</strong></label>
+
+    <div class="d-flex gap-2">
+        <button class="view-summary" @bind="OpenPopup">
+            <div class="d-flex align-items-center gap-2 fs-5">
+                <span>☰</span>
+                <strong>View Summary</strong>
+            </div>
+        </button>
+    </div>  
+
+    @if (showPopup)
+{
+    <div class="overlay">
+        <div class="overlay-content bg-white text-dark rounded p-4">
+            <button class="btn-close float-end" @onclick="ClosePopup"></button>
+            <h3>Summary</h3>
+            <p>This is your summary content.</p>
+        </div>
+    </div>
+}
+
+</div>
+
+<!-- View Summary -->
+
+
+@code {
+    private bool showPopup = false;
+
+    private void OpenPopup()
+    {
+        showPopup = true;
+    }
+
+    private void ClosePopup()
+    {
+        showPopup = false;
     }
 }

@@ -11,7 +11,7 @@ main {
 }
 
 .sidebar {
-    background-color: #FFFFFF
+    background-color: var(--color-light);
 }
 
 .top-row {
