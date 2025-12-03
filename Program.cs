@@ -13,9 +13,12 @@ builder.Services.AddRazorComponents()
 // Add user session service for managing login state
 builder.Services.AddScoped<UserSessionService>();
 
+<<<<<<< HEAD
+=======
 // ✅ Ensure database uses correct absolute path
 var dbPath = Path.Combine(Directory.GetCurrentDirectory(), "GymTracker.db");
 Console.WriteLine($"💾 Using DB at: {dbPath}");
+>>>>>>> 28edec13a97a88b688611b6a85ce50eab1b220be
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlite($"Data Source={dbPath}"));
@@ -27,6 +30,10 @@ builder.Services.AddAuthorizationCore();
 // Add local storage
 builder.Services.AddBlazoredLocalStorage();
 
+<<<<<<< HEAD
+
+=======
+>>>>>>> 28edec13a97a88b688611b6a85ce50eab1b220be
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
