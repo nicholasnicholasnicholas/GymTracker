@@ -12,6 +12,40 @@
     --font-main: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 }
 
+/* Dark theme overrides
+   - Applies automatically when the OS prefers dark mode
+   - Also applies when `body.dark-mode` or `html[data-theme="dark"]` is present
+*/
+@media (prefers-color-scheme: dark) {
+    :root {
+        --color-primary: #00FF90;
+        --color-primary-light: #05422e; /* darker card accent */
+        --color-primary-lighter: rgb(14, 32, 27);
+        --color-shadow: #0f221a;
+        --color-light: #0b1412; /* card background (dark) */
+        --color-dark: #cbe7df; /* main text (light) */
+        --color-dark-light: #b7ffd6;
+        --color-bg: #1b332c; /* page background */
+        --font-main: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    }
+}
+
+html[data-theme="dark"], body.dark-mode {
+        --color-primary: #00FF90;
+        --color-primary-light: #05422e; /* darker card accent */
+        --color-primary-lighter: rgb(14, 32, 27);
+        --color-shadow: #0f221a;
+        --color-light: #0b1412; /* card background (dark) */
+        --color-dark: #cbe7df; /* main text (light) */
+        --color-dark-light: #b7ffd6;
+        --color-bg: #1b332c; /* page background */
+}
+
+/* Smooth transitions when toggling theme */
+html, body, .container-white, .container-light, .container-date, .btn, .profile-dropdown, .auth-card {
+    transition: background-color 180ms ease, color 180ms ease, box-shadow 180ms ease;
+}
+
 .color-primary {
     color: var(--color-primary);
 }
@@ -143,8 +177,6 @@ h1:focus {
 .user-pulse-icon {
     width: 24px;
     height: 24px;
-<<<<<<< HEAD
-=======
     display: inline-block;
     position: relative;
 }
@@ -221,6 +253,10 @@ h1:focus {
 .button-danger {
     background-color: var(--color-dark);
     color: var(--color-primary);
+}
+
+.auth-card {
+    color: #00554E
 }
 
 /* login and register buttons */
@@ -331,84 +367,6 @@ h1:focus {
 }
 
 .pfp-upload-label {
->>>>>>> 28edec13a97a88b688611b6a85ce50eab1b220be
     display: inline-block;
     cursor: pointer;
 }
-<<<<<<< HEAD
-.user-pulse-icon .pulse-dot {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    width: 12px;
-    height: 12px;
-    background: var(--color-primary); /* theme color */
-    border-radius: 50%;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.25), 0 0 0 6px rgba(0,0,0,0.04);
-    z-index: 4000;
-}
-.user-pulse-icon .pulse-ring {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    background: var(--color-primary-light);
-    animation: pulse 1.6s infinite cubic-bezier(0.66, 0, 0, 1);
-    z-index: 3999;
-}
-@keyframes pulse {
-    0% {
-        transform: translate(-50%, -50%) scale(1);
-        opacity: 0.9;
-    }
-    70% {
-        transform: translate(-50%, -50%) scale(2.6);
-        opacity: 0;
-    }
-    100% {
-        transform: translate(-50%, -50%) scale(2.6);
-        opacity: 0;
-    }
-}
-
-/* brief bounce when marker is placed */
-.user-pulse-icon.bounce {
-    animation: bounce 0.6s ease-out;
-}
-@keyframes bounce {
-    0% { transform: translate(-50%, -60%) scale(0.98); }
-    30% { transform: translate(-50%, -72%) scale(1.12); }
-    50% { transform: translate(-50%, -60%) scale(0.98); }
-    70% { transform: translate(-50%, -66%) scale(1.04); }
-    100% { transform: translate(-50%, -60%) scale(1); }
-}
-
-.container-white {
-    background-color: var(--color-light);
-}
-
-.container-light {
-    background-color: var(--color-shadow);
-}
-
-.container-date {
-    background-color: var(--color-primary-light);
-    color: var(--color-dark);
-    border: none
-}
-
-.button-success {
-    background-color: var(--color-primary-light);
-    color: var(--color-dark);
-}
-
-.button-danger {
-    background-color: var(--color-dark);
-    color: var(--color-primary);
-}
-=======
->>>>>>> 28edec13a97a88b688611b6a85ce50eab1b220be

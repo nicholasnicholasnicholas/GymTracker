@@ -23,7 +23,5 @@ namespace GymTracker.Services
         {
             OnProfileSaved?.Invoke();
         }
-
     }
-}
-
+}   
