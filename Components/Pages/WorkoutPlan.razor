@@ -162,56 +162,104 @@
     // Preset templates
     private Dictionary<string, List<WorkoutExercise>> Templates => new()
     {
-        ["Push / Pull / Legs (3-day)"] = new List<WorkoutExercise>
+        ["Push / Pull / Legs (6x per week)"] = new List<WorkoutExercise>
         {
-            new() { Day = "Monday", Name = "Barbell Bench Press", Sets = 4, Reps = 8, MuscleGroup = "Chest", },
+            new() { Day = "Monday", Name = "Barbell Bench Press", Sets = 4, Reps = 8, MuscleGroup = "Chest", Notes = "Warm-up sets as needed" },
             new() { Day = "Monday", Name = "Barbell Incline Bench Press", Sets = 3, Reps = 8, MuscleGroup = "Chest", Notes = "Incline sub 45 degrees" },
-            new() { Day = "Monday", Name = "Machine Chest Flys", Sets = 3, Reps = 12, MuscleGroup = "Chest", },
-            new() { Day = "Monday", Name = "Dumbell Shoulder Press", Sets = 3, Reps = 10, MuscleGroup = "Shoulders", },
-            new() { Day = "Monday", Name = "Cable Lateral Raises", Sets = 3, Reps = 12, MuscleGroup = "Shoulders", },
+            new() { Day = "Monday", Name = "Machine Chest Flys", Sets = 3, Reps = 12, MuscleGroup = "Chest", Notes = "Focus on stretch" },
+            new WorkoutExercise() { Day = "Monday", Name = "Dumbell Shoulder Press", Sets = 3, Reps = 10, MuscleGroup = "Shoulders", Notes = "Seated or standing" },
+            new WorkoutExercise() { Day = "Monday", Name = "Dumbell Lateral Raises", Sets = 3, Reps = 12, MuscleGroup = "Shoulders", Notes = "Focus on form" },
+            new WorkoutExercise() { Day = "Monday", Name = "Rope Pull Downs", Sets = 3, Reps = 12, MuscleGroup = "Triceps", Notes = "Use assisted machine if needed" },
+            new WorkoutExercise() { Day = "Monday", Name = "Cable Pushdowns", Sets = 3, Reps = 12, MuscleGroup = "Triceps", Notes = "Focus on contraction" },
             new() { Day = "Monday", Name = "Tricep Dips", Sets = 3, Reps = 12, MuscleGroup = "Triceps", Notes = "Bodyweight or weighted" },
+            
 
-            new() { Day = "Wednesday", Name = "Pull-ups", Sets = 4, Reps = 6, MuscleGroup = "Back" },
-            new() { Day = "Wednesday", Name = "Barbell Row", Sets = 4, Reps = 8, MuscleGroup = "Back" },
-            new() { Day = "Wednesday", Name = "Bicep Curls", Sets = 3, Reps = 12, MuscleGroup = "Biceps" },
+            new() { Day = "Tuesday", Name = "Pull-ups", Sets = 4, Reps = 6, MuscleGroup = "Back", Notes = "Use assisted machine if needed" },
+            new() { Day = "Tuesday", Name = "Lateral Pulldown", Sets = 3, Reps = 12, MuscleGroup = "Back", Notes = "Focus on contraction" },
+            new() { Day = "Tuesday", Name = "Back Row", Sets = 3, Reps = 12, MuscleGroup = "Biceps" , Notes = "Any row variation (cable, machine, dumbbell, etc.)"},
+            new() { Day = "Tuesday", Name = "Rope Face Pulls/T-Bar Row", Sets = 4, Reps = 8, MuscleGroup = "Back", Notes = "Focus on form" },
+            new() { Day = "Tuesday", Name = "Bicep Curls", Sets = 3, Reps = 12, MuscleGroup = "Biceps", Notes = "Squeeze to feel contraction" },
+            new() { Day = "Tuesday", Name = "Hammer Curls", Sets = 3, Reps = 12, MuscleGroup = "Biceps", Notes = "Go slow going down after rep" },
+            new() { Day = "Tuesday", Name = "Preacher Curls", Sets = 3, Reps = 12, MuscleGroup = "Biceps", Notes = "Can do a dropset or burnout" },
 
-            new() { Day = "Friday", Name = "Back Squat", Sets = 4, Reps = 8, MuscleGroup = "Legs" },
-            new() { Day = "Friday", Name = "Romanian Deadlift", Sets = 3, Reps = 10, MuscleGroup = "Hamstrings" },
-            new() { Day = "Friday", Name = "Calf Raises", Sets = 4, Reps = 15, MuscleGroup = "Calves" }
+            new() { Day = "Wednesday", Name = "Back Squat", Sets = 4, Reps = 8, MuscleGroup = "Quadriceps, Glutes", Notes = "Warm-up sets as needed" },
+            new() { Day = "Wednesday", Name = "Deadlift", Sets = 3, Reps = 10, MuscleGroup = "Hamstrings", Notes = "Maintain a neutral spine" },
+            new() { Day = "Wednesday", Name = "Quad Extension", Sets = 3, Reps = 12, MuscleGroup = "Quadriceps", Notes = "Isolate legs for maximum contraction" },
+            new() { Day = "Wednesday", Name = "Hip Abductor Machine", Sets = 4, Reps = 15, MuscleGroup = "Glutes", Notes = "Focus on form" },
+            new() { Day = "Wednesday", Name = "Calf Raises", Sets = 4, Reps = 15, MuscleGroup = "Calves", Notes = "Pause at the top" },
+
+            new() { Day = "Thursday", Name = "Dumbbell Bench Press", Sets = 4, Reps = 8, MuscleGroup = "Chest", Notes = "Warm-up sets as needed" },
+            new() { Day = "Thursday", Name = "Dumbell Incline Bench Press", Sets = 3, Reps = 8, MuscleGroup = "Chest", Notes = "Incline sub 45 degrees" },
+            new() { Day = "Thursday", Name = "Cable Chest Flys", Sets = 3, Reps = 12, MuscleGroup = "Chest", Notes = "Squeeze when your hands meet" },
+            new() { Day = "Thursday", Name = "Barbell/Smith Machine Shoulder Press", Sets = 3, Reps = 10, MuscleGroup = "Shoulders", Notes = "Keep core tight" },
+            new() { Day = "Thursday", Name = "Dumbell Lateral Raises", Sets = 3, Reps = 12, MuscleGroup = "Shoulders", Notes = "Focus on form rather than weight" },
+            new() { Day = "Thursday", Name = "Skull Crushers", Sets = 3, Reps = 12, MuscleGroup = "Triceps", Notes = "Control the weight" },
+            new() { Day = "Thursday", Name = "Overhead Tricep Extension", Sets = 3, Reps = 12, MuscleGroup = "Triceps", Notes = "Keep elbows close to head" },
+            new() { Day = "Thursday", Name = "Tricep Dips", Sets = 3, Reps = 12, MuscleGroup = "Triceps", Notes = "Bodyweight or weighted" },
+
+            new() { Day = "Friday", Name = "Pull-ups", Sets = 4, Reps = 6, MuscleGroup = "Back", Notes = "Use assisted machine if needed" },
+            new() { Day = "Friday", Name = "Lateral Pulldown", Sets = 3, Reps = 12, MuscleGroup = "Back", Notes = "Bring bar to upper chest" },
+            new() { Day = "Friday", Name = "Back Row", Sets = 3, Reps = 12, MuscleGroup = "Biceps" , Notes = "Any row variation (cable, machine, dumbbell, etc.)"},
+            new() { Day = "Friday", Name = "Rope Face Pulls/T-Bar Row", Sets = 4, Reps = 8, MuscleGroup = "Back", Notes = "Make sure to feel contraction in upper back" },
+            new() { Day = "Friday", Name = "Bicep Curls", Sets = 3, Reps = 12, MuscleGroup = "Biceps", Notes = "Slow and controlled" },
+            new() { Day = "Friday", Name = "Cable Forearm Curls", Sets = 3, Reps = 12, MuscleGroup = "Biceps", Notes = "Focus on form" },
+            new() { Day = "Friday", Name = "Machine Preacher Curls", Sets = 3, Reps = 12, MuscleGroup = "Biceps", Notes = "Can use individual arms or both. Burnout/dropset" },
+
+
+            new() { Day = "Saturday", Name = "Bulgarian Split Squat", Sets = 4, Reps = 8, MuscleGroup = "Quadriceps", Notes = "Per leg" },
+            new() { Day = "Saturday", Name = "RDLs", Sets = 3, Reps = 10, MuscleGroup = "Hamstrings", Notes = "Keep back straight" },
+            new() { Day = "Saturday", Name = "Quad Extension", Sets = 3, Reps = 12, MuscleGroup = "Quadriceps", Notes = "Isolate legs for maximum contraction" },
+            new() { Day = "Saturday", Name = "Machine Hamstring Curls", Sets = 3, Reps = 12, MuscleGroup = "Hamstrings", Notes = "Control the weight" },
+            new() { Day = "Saturday", Name = "Hip Abductor Machine", Sets = 4, Reps = 15, MuscleGroup = "Glutes/Hips" },
+            new() { Day = "Saturday", Name = "Calf Raises", Sets = 4, Reps = 15, MuscleGroup = "Calves", Notes = "Pause at the top" },
         },
 
         ["Full Body (3x per week)"] = new List<WorkoutExercise>
         {
-            new() { Day = "Monday", Name = "Back Squat", Sets = 3, Reps = 5, MuscleGroup = "Legs" },
-            new() { Day = "Monday", Name = "Bench Press", Sets = 3, Reps = 5, MuscleGroup = "Chest" },
-            new() { Day = "Monday", Name = "Barbell Row", Sets = 3, Reps = 8, MuscleGroup = "Back" },
+            new() { Day = "Monday", Name = "Back Squat", Sets = 3, Reps = 10, MuscleGroup = "Quadriceps/Glutes", Notes = "Warm-up sets as needed" },
+            new() { Day = "Monday", Name = "Incline Dumbell Bench Press", Sets = 4, Reps = 8, MuscleGroup = "Chest" },
+            new() { Day = "Monday", Name = "Barbell Row", Sets = 3, Reps = 12, MuscleGroup = "Back", Notes = "Underhand grip" },
+            new() { Day = "Monday", Name = "Quad Extensions", Sets = 3, Reps = 12, MuscleGroup = "Quadriceps" },
+            new() { Day = "Monday", Name = "Dumbbell Bicep Curls", Sets = 3, Reps = 12, MuscleGroup = "Biceps", Notes = "Alternating" },
+            new() { Day = "Monday", Name = "Tricep Dips", Sets = 3, Reps = 12, MuscleGroup = "Triceps" },
 
-            new() { Day = "Wednesday", Name = "Front Squat", Sets = 3, Reps = 5, MuscleGroup = "Legs" },
-            new() { Day = "Wednesday", Name = "Overhead Press", Sets = 3, Reps = 5, MuscleGroup = "Shoulders" },
-            new() { Day = "Wednesday", Name = "Lat Pulldown", Sets = 3, Reps = 10, MuscleGroup = "Back" },
+            new() { Day = "Wednesday", Name = "Dumbell Rows", Sets = 3, Reps = 12, MuscleGroup = "Back" },
+            new() { Day = "Wednesday", Name = "Arnold Press", Sets = 3, Reps = 10, MuscleGroup = "Shoulders", Notes = "Use moderate weight for form" },
+            new() { Day = "Wednesday", Name = "Bulgarian Split Squat", Sets = 3, Reps = 10, MuscleGroup = "Quadriceps/Glutes", Notes = "Per leg" },
+            new() { Day = "Wednesday", Name = "RDLs", Sets = 3, Reps = 10, MuscleGroup = "Hamstrings" },
+            new() { Day = "Wednesday", Name = "Cable Tricep Pushdowns", Sets = 3, Reps = 12, MuscleGroup = "Triceps" },
+            new() { Day = "Wednesday", Name = "Cable Bicep Curls", Sets = 3, Reps = 12, MuscleGroup = "Triceps", Notes = "Using curly bar attachment" },
 
-            new() { Day = "Friday", Name = "Deadlift", Sets = 3, Reps = 5, MuscleGroup = "Posterior Chain" },
-            new() { Day = "Friday", Name = "Incline Dumbbell Press", Sets = 3, Reps = 8, MuscleGroup = "Chest" },
-            new() { Day = "Friday", Name = "Seated Row", Sets = 3, Reps = 10, MuscleGroup = "Back" }
+            new() { Day = "Friday", Name = "Deadlift", Sets = 3, Reps = 8, MuscleGroup = "Posterior Chain" },
+            new() { Day = "Friday", Name = "Flat Barbell Bench Press", Sets = 4, Reps = 8, MuscleGroup = "Chest" },
+            new() { Day = "Friday", Name = "Seated Row", Sets = 3, Reps = 12, MuscleGroup = "Back" },
+            new() { Day = "Friday", Name = "Leg Press", Sets = 3, Reps = 10, MuscleGroup = "Quadriceps/Glutes" },
+            new WorkoutExercise() { Day = "Friday", Name = "Hammer Curls", Sets = 3, Reps = 12, MuscleGroup = "Biceps", Notes = "Use dumbells" },
+            new WorkoutExercise() { Day = "Friday", Name = "Overhead Tricep Extension", Sets = 3, Reps = 12, MuscleGroup = "Triceps" },
         },
 
         ["Upper / Lower (4-day)"] = new List<WorkoutExercise>
         {
-            new() { Day = "Monday", Name = "Bench Press", Sets = 4, Reps = 6, MuscleGroup = "Chest" },
-            new() { Day = "Monday", Name = "Pull-ups", Sets = 4, Reps = 6, MuscleGroup = "Back" },
-            new() { Day = "Monday", Name = "Lateral Raises", Sets = 3, Reps = 12, MuscleGroup = "Shoulders" },
+            new() { Day = "Monday", Name = "Bench Press", Sets = 4, Reps = 6, MuscleGroup = "Chest", Notes = "Warm-up sets as needed" },
+            new() { Day = "Monday", Name = "Pull-ups", Sets = 4, Reps = 6, MuscleGroup = "Back", Notes = "Use assisted machine if needed" },
+            new() { Day = "Monday", Name = "Lateral Raises", Sets = 3, Reps = 12, MuscleGroup = "Shoulders", Notes = "Light weight for form" },
+            new() { Day = "Monday", Name = "Dumbbell Bicep Curls", Sets = 3, Reps = 12, MuscleGroup = "Biceps"},
+            new() { Day = "Monday", Name = "Tricep Dips", Sets = 3, Reps = 12, MuscleGroup = "Triceps", Notes = "Use assisted machine if needed" },
 
-            new() { Day = "Tuesday", Name = "Back Squat", Sets = 4, Reps = 8, MuscleGroup = "Legs" },
-            new() { Day = "Tuesday", Name = "Leg Press", Sets = 3, Reps = 10, MuscleGroup = "Legs" },
-            new() { Day = "Tuesday", Name = "Leg Curls", Sets = 3, Reps = 12, MuscleGroup = "Hamstrings" },
+            new() { Day = "Tuesday", Name = "Back Squat", Sets = 4, Reps = 8, MuscleGroup = "Legs", Notes = "Warm-up sets as needed" },
+            new() { Day = "Tuesday", Name = "Leg Press", Sets = 3, Reps = 10, MuscleGroup = "Legs", Notes = "Feet shoulder-width apart" },
+            new() { Day = "Tuesday", Name = "Quad Extensions", Sets = 3, Reps = 12, MuscleGroup = "Quadriceps", Notes = "One leg at a time to increase difficulty"},
+            new() { Day = "Tuesday", Name = "Hamstring Curls", Sets = 3, Reps = 12, MuscleGroup = "Hamstrings", Notes = "Slow and controlled" },
 
-            new() { Day = "Thursday", Name = "Incline Bench", Sets = 4, Reps = 8, MuscleGroup = "Chest" },
-            new() { Day = "Thursday", Name = "Barbell Row", Sets = 4, Reps = 8, MuscleGroup = "Back" },
-            new() { Day = "Thursday", Name = "Face Pulls", Sets = 3, Reps = 15, MuscleGroup = "Rear Delts" },
+            new() { Day = "Thursday", Name = "Incline Bench", Sets = 4, Reps = 8, MuscleGroup = "Chest", Notes = "Incline sub 45 degrees"},
+            new() { Day = "Thursday", Name = "Barbell Row", Sets = 4, Reps = 8, MuscleGroup = "Back", Notes = "Underhand grip" },
+            new() { Day = "Thursday", Name = "Face Pulls", Sets = 3, Reps = 15, MuscleGroup = "Rear Delts", Notes = "Use rope attachment" },
+            new() { Day = "Thursday", Name = "Dumbbell Shrugs", Sets = 3, Reps = 12, MuscleGroup = "Traps", Notes = "Focus on squeezing at the top" },
 
-            new() { Day = "Friday", Name = "Deadlift", Sets = 3, Reps = 5, MuscleGroup = "Posterior Chain" },
+            new() { Day = "Friday", Name = "Deadlift", Sets = 3, Reps = 5, MuscleGroup = "Posterior Chain", Notes = "Focus on form" },
             new() { Day = "Friday", Name = "Walking Lunges", Sets = 3, Reps = 12, MuscleGroup = "Legs", Notes = "Per leg" },
-            new() { Day = "Friday", Name = "Calf Raises", Sets = 4, Reps = 15, MuscleGroup = "Calves" }
+            new() { Day = "Friday", Name = "Calf Raises", Sets = 4, Reps = 15, MuscleGroup = "Calves", Notes = "Pause at top" },
+            new() { Day = "Friday", Name = "Plank", Sets = 3, Reps = 30, MuscleGroup = "Core", Notes = "Hold for 30 seconds" }
         }
     };
 
