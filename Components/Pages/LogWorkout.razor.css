@@ -277,10 +277,164 @@
 }
 
 .overlay-content {
-    background-color: #fff;
-    max-width: 500px;
+    background-color: var(--color-light);
+    color: var(--color-dark);
+    
+    max-width: 900px;
     width: 90%;
     padding: 2rem;
     border-radius: 10px;
     box-shadow: 0 0 15px rgba(0,0,0,0.3);
+}
+
+/* ========== Summary Button Container ========== */
+.summary-overlay {    
+    font-size: 1.25rem;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    padding-left: 16px;
+    padding-right: 8px;
+
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    
+    transform: scale(1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    animation: cardFadeIn 0.3s ease-out;
+}
+
+.summary-body {
+    background-color: var(--color-shadow);
+    border-radius: 8px;
+    font-size: 1.25rem;
+
+    padding-top: 8px;
+    padding-bottom: 8px;
+    padding-left: 16px;
+    padding-right: 16px;
+
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.progress-bar {
+    background: linear-gradient(90deg, #0dce7a 0%, #4adf9c 100%);
+    color: var(--color-primary);
+    transition: width 0.6s ease;
+}
+
+@keyframes slideIn {
+    0% {
+        width: 0 !important;
+    }
+    100% {
+        width: var(--progress-width) !important;
+    }
+}
+
+.progress {
+    background: linear-gradient(90deg, var(--color-primary-lighter) 0%, var(--color-primary-light) 100%);
+}
+
+/* ========== Muscle Heat Map ========== */
+.muscle-heatmap-container {
+    position: relative;
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.muscle-heatmap-base {
+    position: relative;
+    width: 100%;
+    height: auto;
+    display: block;
+    z-index: 1;
+    filter: invert(1);
+}
+
+@media (prefers-color-scheme: dark) {
+    .muscle-heatmap-base {
+        filter: none;
+    }
+}
+
+.muscle-heatmap-overlay {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    z-index: 2;
+}   
+
+/* Grayscale + darker appearance for unused muscles */
+.muscle-grayscale {
+    filter: grayscale(100%) brightness(35%) contrast(85%);
+}
+
+/* ========== Summary Grid Layout ========== */
+.summary-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 1.5rem;
+    min-height: 350px;
+}
+
+.summary-left {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.summary-right {
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    max-height: 400px;
+    padding-right: 0.5rem;
+}
+
+.summary-right::-webkit-scrollbar {
+    width: 8px;
+}
+
+.summary-right::-webkit-scrollbar-track {
+    background: var(--color-surface);
+}
+
+.summary-right::-webkit-scrollbar-thumb {
+    background: var(--color-text);
+    border-radius: 4px;
+}
+
+.summary-right::-webkit-scrollbar-thumb:hover {
+    background: var(--color-text-secondary);
+}
+
+.percent-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 0.75rem 0.5rem;
+}
+
+/* Responsive: stack columns on smaller screens */
+@media (max-width: 768px) {
+    .summary-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    .summary-right {
+        max-height: 300px;
+    }
 }

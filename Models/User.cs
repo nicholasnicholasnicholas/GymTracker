@@ -4,6 +4,7 @@
 *   Passwords are hashed for security
 */
 
+using System.Text.Json.Serialization;
 
 namespace GymTracker.Models
 {
@@ -25,6 +26,7 @@ namespace GymTracker.Models
         public string? ProfileImageMimeType { get; set; } // e.g. "image/png"
 
         // Persisted workout sessions for this user
+        [JsonIgnore]
         public List<WorkoutSession> WorkoutSessions { get; set; } = new();
     }
 }

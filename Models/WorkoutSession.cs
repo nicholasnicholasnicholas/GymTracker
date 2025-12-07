@@ -1,5 +1,7 @@
 namespace GymTracker.Models
 {
+    using System.Text.Json.Serialization;
+
     public class WorkoutSession
     {
         // Primary key for EF
@@ -7,6 +9,7 @@ namespace GymTracker.Models
 
         // Which user this session belongs to
         public int? UserId { get; set; }
+        [JsonIgnore]
         public User? User { get; set; }
 
         public DateTime Date { get; set; } = DateTime.Now;
