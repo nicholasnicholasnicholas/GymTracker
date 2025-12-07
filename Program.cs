@@ -6,6 +6,10 @@ using Blazored.LocalStorage;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Configure for Railway deployment
+var port = Environment.GetEnvironmentVariable("PORT") ?? "5000";
+builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
+
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
@@ -35,10 +39,12 @@ var app = builder.Build();
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error", createScopeForErrors: true);
-    app.UseHsts();
+    // app.UseHsts(); // Commented out for Railway
 }
 
-app.UseHttpsRedirection();
+// app.UseHttpsRedirection(); // Commented out for Railway (Railway handles HTTPS)
+
+app.UseStaticFiles(); // Add this for Railway
 app.UseAntiforgery();
 
 app.MapStaticAssets();
