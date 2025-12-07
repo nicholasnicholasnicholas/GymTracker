@@ -43,6 +43,8 @@ if (!app.Environment.IsDevelopment())
 }
 
 // app.UseHttpsRedirection(); // Commented out for Railway (Railway handles HTTPS)
+
+app.UseStaticFiles(); // Add this for Railway
 app.UseAntiforgery();
 
 app.MapStaticAssets();
