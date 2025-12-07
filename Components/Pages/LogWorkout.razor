@@ -98,6 +98,13 @@
 
             workoutTimer?.Stop();
             workoutTimer?.Dispose();
+            
+            // Save the duration to the session and auto-save
+            if (currentSession != null)
+            {
+                currentSession.Duration = workoutDuration.TotalSeconds;
+                ScheduleAutoSave();
+            }
         }
     }
 
@@ -226,10 +233,42 @@
                         <strong>Add Exercise</strong>
                     </div>
                 </option>
-                @foreach (var exercise in ExerciseLibrary.Exercises)
-                {
-                    <option value="@exercise.Name">@exercise.Name</option>
-                }
+                <optgroup label="Chest">
+                    @foreach (var exercise in ExerciseLibrary.Exercises.Where(e => e.MusclesWorked.ContainsKey("Upper Chest") || e.MusclesWorked.ContainsKey("Lower Chest")))
+                    {
+                        <option value="@exercise.Name">@exercise.Name</option>
+                    }
+                </optgroup>
+                <optgroup label="Back">
+                    @foreach (var exercise in ExerciseLibrary.Exercises.Where(e => e.MusclesWorked.ContainsKey("Upper Back")))
+                    {
+                        <option value="@exercise.Name">@exercise.Name</option>
+                    }
+                </optgroup>
+                <optgroup label="Legs">
+                    @foreach (var exercise in ExerciseLibrary.Exercises.Where(e => e.MusclesWorked.ContainsKey("Quads") || e.MusclesWorked.ContainsKey("Hamstrings") || e.MusclesWorked.ContainsKey("Glutes") || e.MusclesWorked.ContainsKey("Calves")))
+                    {
+                        <option value="@exercise.Name">@exercise.Name</option>
+                    }
+                </optgroup>
+                <optgroup label="Arms">
+                    @foreach (var exercise in ExerciseLibrary.Exercises.Where(e => e.MusclesWorked.ContainsKey("Biceps") || e.MusclesWorked.ContainsKey("Triceps")))
+                    {
+                        <option value="@exercise.Name">@exercise.Name</option>
+                    }
+                </optgroup>
+                <optgroup label="Shoulders">
+                    @foreach (var exercise in ExerciseLibrary.Exercises.Where(e => e.MusclesWorked.ContainsKey("Shoulders")))
+                    {
+                        <option value="@exercise.Name">@exercise.Name</option>
+                    }
+                </optgroup>
+                <optgroup label="Core">
+                    @foreach (var exercise in ExerciseLibrary.Exercises.Where(e => e.MusclesWorked.ContainsKey("Abs")))
+                    {
+                        <option value="@exercise.Name">@exercise.Name</option>
+                    }
+                </optgroup>
             </select>
         </div>
     }
@@ -259,7 +298,7 @@
         );
 
         newExerciseName = "";
-        return;
+        ScheduleAutoSave();
     }
 
     private void RemoveExercise(WorkoutEntry entryToRemove)
@@ -382,6 +421,9 @@
                 _autoSaveTimer.Stop();
             }
 
+            workoutTimer?.Stop();
+            workoutTimer?.Dispose();
+
             if (_autoSavePending)
             {
                 await SaveSessionToServer();
@@ -431,6 +473,7 @@
         else
         {
             currentSession = session;
+            workoutDuration = TimeSpan.FromSeconds(session.Duration);
         }
 
         // Allow the component to render the loaded entries, then fix heights
@@ -470,30 +513,84 @@
 
 <div class="container-fluid container-white px-3 py-3 mt-3 rounded">
     <label class="form-label fs-4"><strong>Summary</strong></label>
-
-    <div class="d-flex gap-2">
-        <button class="view-summary" @bind="OpenPopup">
-            <div class="d-flex align-items-center gap-2 fs-5">
-                <span>☰</span>
-                <strong>View Summary</strong>
-            </div>
-        </button>
-    </div>  
+    <!-- View Summary Button -->
+    <button class="view-summary w-100" @onclick="OpenPopup">
+        <div class="d-flex align-items-center gap-2 fs-5">
+            <span>☰</span>
+            <strong>View Summary</strong>
+        </div>
+    </button>
 
     @if (showPopup)
-{
-    <div class="overlay">
-        <div class="overlay-content bg-white text-dark rounded p-4">
-            <button class="btn-close float-end" @onclick="ClosePopup"></button>
-            <h3>Summary</h3>
-            <p>This is your summary content.</p>
+    {
+        <div class="overlay summary-overlay">
+            <div class="overlay-content p-3">
+                <button class="btn float-end" @onclick="ClosePopup">×</button>
+                <label class="form-label fs-4"><strong>Summary</strong></label>
+                
+                @if (currentSession != null && currentSession.WorkoutEntries.Count > 0)
+                {
+                    <div class="summary-body mb-2">
+                        <div class="col-12">
+                            <strong>Duration:</strong> @formattedDuration
+                        </div>
+                    </div>
+
+                    <div class="summary-body mb-3">
+                        @{
+                            var muscleStats = GetMusclePercentages();
+                        }
+                        <div class="summary-grid">
+                            <div class="summary-left">  
+                                <div class="muscle-heatmap-container">
+                                    <img src="/bodyheatmap/Body.png" class="muscle-heatmap-base" alt="Body">
+                                    @foreach (var m in muscleStats)
+                                    {
+                                        var filename = System.Uri.EscapeDataString(m.Name + ".png");
+                                        var opacity = m.PercentOfMax > 0 ? m.PercentOfMax / 100.0 : .5;
+                                        var filterClass = m.PercentOfMax > 0 ? string.Empty : "muscle-grayscale";
+                                        <img src="/bodyheatmap/@(filename)" class="muscle-heatmap-overlay @(filterClass)" style=@($"opacity: {opacity}") alt="@m.Name">
+                                    }
+                                </div>
+                            </div>
+
+                            <div class="summary-right">
+                                @if (muscleStats.Count > 0)
+                                {
+                                    <div class="percent-list">
+                                    @foreach (var m in muscleStats.OrderByDescending(x => x.Points))
+                                    {
+                                        @if (m.Points > 0)
+                                        {
+                                            <div class="mb-2">
+                                                <div class="d-flex justify-content-between align-items-center mb-1" style="font-size: 0.9rem;">
+                                                    <div><strong>@m.Name</strong></div>
+                                                    <div><small class="text" style="color: var(--color-dark); font-size: 0.8rem;">@m.Percent%</small></div>
+                                                </div>
+                                                <div class="progress" style="height:8px">
+                                                    <div class="progress-bar" role="progressbar" style=@($"width:{m.PercentOfMax}%") aria-valuenow="@(m.PercentOfMax)" aria-valuemin="0" aria-valuemax="100"></div>
+                                                </div>
+                                            </div>
+                                        }
+                                    }
+                                    </div>
+                                }
+                                else
+                                {
+                                    <p class="text-muted">No exercises added yet</p>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <p class="text-muted">No exercises added yet</p>
+                }
+            </div>
         </div>
-    </div>
-}
-
+    }
 </div>
-
-<!-- View Summary -->
 
 
 @code {
@@ -507,5 +604,88 @@
     private void ClosePopup()
     {
         showPopup = false;
+    }
+
+    // Calculate aggregated muscles worked from all exercises in the current session
+    private Dictionary<string, int> GetMusclesSummary()
+    {
+        var musclesSummary = new Dictionary<string, int>();
+
+        if (currentSession == null || currentSession.WorkoutEntries.Count == 0)
+            return musclesSummary;
+
+        foreach (var entry in currentSession.WorkoutEntries)
+        {
+            // Find the exercise in the library to get its muscle groups
+            var exercise = ExerciseLibrary.Exercises.FirstOrDefault(e => e.Name == entry.ExerciseName);
+            if (exercise != null)
+            {
+                foreach (var muscle in exercise.MusclesWorked)
+                {
+                    if (musclesSummary.ContainsKey(muscle.Key))
+                    {
+                        musclesSummary[muscle.Key] += muscle.Value;
+                    }
+                    else
+                    {
+                        musclesSummary[muscle.Key] = muscle.Value;
+                    }
+                }
+            }
+        }
+
+        return musclesSummary;
+    }
+
+    // Returns a list of muscle stats: name, raw points, percentage of total points, and percentage scaled to the top muscle
+    // Includes muscles that have zero points so they can be displayed in the heatmap as faint/grayscale overlays
+    private List<(string Name, int Points, double Percent, double PercentOfMax)> GetMusclePercentages()
+    {
+        // Start with all known muscles from both the ExerciseLibrary and MuscleLibrary
+        // (this ensures muscles listed in `MuscleLibrary` but not referenced by any exercise are included)
+        var exerciseMuscles = ExerciseLibrary.Exercises
+            .SelectMany(e => e.MusclesWorked.Keys)
+            .Distinct(StringComparer.OrdinalIgnoreCase);
+
+        var libraryMuscles = MuscleLibrary.Muscles ?? new List<string>();
+
+        var allMuscles = exerciseMuscles
+            .Union(libraryMuscles, StringComparer.OrdinalIgnoreCase)
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList();
+
+        var dict = allMuscles.ToDictionary(m => m, m => 0);
+
+        // Aggregate points from current session entries into the dict
+        if (currentSession != null) 
+        {
+            foreach (var entry in currentSession.WorkoutEntries)
+            {
+                var exercise = ExerciseLibrary.Exercises.FirstOrDefault(e => e.Name == entry.ExerciseName);
+                if (exercise == null) continue;
+
+                foreach (var muscle in exercise.MusclesWorked)
+                {
+                    if (dict.ContainsKey(muscle.Key))
+                        dict[muscle.Key] += muscle.Value;
+                    else
+                        dict[muscle.Key] = muscle.Value; // fallback (shouldn't normally happen)
+                }
+            }
+        }
+
+        var total = dict.Values.Sum();
+        var result = new List<(string Name, int Points, double Percent, double PercentOfMax)>();
+
+        var maxPoints = dict.Values.Any() ? dict.Values.Max() : 0;
+
+        foreach (var kv in dict.OrderByDescending(k => k.Value))
+        {
+            var pct = total > 0 ? Math.Round(100.0 * kv.Value / total, 1) : 0.0; // percent of total
+            var pctMax = maxPoints > 0 ? Math.Round(100.0 * kv.Value / maxPoints, 1) : 0.0; // percent relative to top muscle
+            result.Add((kv.Key, kv.Value, pct, pctMax));
+        }
+
+        return result;
     }
 }
