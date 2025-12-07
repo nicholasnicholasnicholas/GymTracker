@@ -77,7 +77,11 @@ namespace GymTracker.Services
             if (string.IsNullOrWhiteSpace(username))
                 return null;
 
-            return await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
+            return await _context.Users
+                .Include(u => u.WorkoutSessions)
+                    .ThenInclude(s => s.WorkoutEntries)
+                        .ThenInclude(e => e.Sets)
+                .FirstOrDefaultAsync(u => u.Username == username);
         }
 
         // Update profile image
@@ -98,6 +102,43 @@ namespace GymTracker.Services
             _context.Users.Update(user);
             await _context.SaveChangesAsync();
             return true;
+        }
+
+        // Save or update a WorkoutSession for a user (create if new)
+        public async Task<bool> SaveWorkoutSessionAsync(string username, WorkoutSession session)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
+            if (user == null) return false;
+
+            session.UserId = user.Id;
+
+            // if session has Id==0, it's new; otherwise update
+            if (session.Id == 0)
+            {
+                _context.WorkoutSessions.Add(session);
+            }
+            else
+            {
+                _context.WorkoutSessions.Update(session);
+            }
+
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        // Fetch a workout session for a user by date (date portion only)
+        public async Task<WorkoutSession?> GetWorkoutSessionByDateAsync(string username, DateTime date)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
+            if (user == null) return null;
+
+            var target = await _context.WorkoutSessions
+                .Include(s => s.WorkoutEntries)
+                    .ThenInclude(e => e.Sets)
+                .Where(s => s.UserId == user.Id && s.Date.Year == date.Year && s.Date.Month == date.Month && s.Date.Day == date.Day)
+                .FirstOrDefaultAsync();
+
+            return target;
         }
 
     }

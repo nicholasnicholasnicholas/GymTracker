@@ -1,4 +1,6 @@
 ﻿@inherits LayoutComponentBase
+@using GymTracker.Services
+@inject UserSessionService UserSessionService
 
 <div class="page">
     <div class="sidebar">
@@ -15,3 +17,14 @@
         </article>
     </main>
 </div>
+
+@code {
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await UserSessionService.LoadUserSessionAsync();
+            StateHasChanged();
+        }
+    }
+}

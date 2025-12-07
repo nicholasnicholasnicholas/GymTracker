@@ -4,13 +4,14 @@
     flex-direction: column;
 }
 
+
 main {
     background-color: var(--color-primary-lighter);
     flex: 1;
 }
 
 .sidebar {
-    background-color: #FFFFFF
+    background-color: var(--color-light);
 }
 
 .top-row {
@@ -74,9 +75,6 @@ main {
         width: 0;
     }
 
-    .top-row, article {
-
-    }
 }
 
 #blazor-error-ui {

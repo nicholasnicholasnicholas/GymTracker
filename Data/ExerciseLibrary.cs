@@ -1,71 +1,460 @@
 using GymTracker.Models;
-using GymTracker.Data;
 
 public static class ExerciseLibrary
 {
-    public static readonly List<Exercise> All = new()
+    public static readonly List<Exercise> Exercises = new()
     {
+        // ========== CHEST EXERCISES ==========
         new Exercise {
-            Id = 1,
             Name = "Flat Bench Press",
-            MusclesWorked = new Dictionary<Muscle, int>
+            MusclesWorked = new Dictionary<string, int>
             {
-                { MuscleLibrary.All.First(m => m.Name == "Upper Chest"), 8 },
-                { MuscleLibrary.All.First(m => m.Name == "Lower Chest"), 8 },
-                { MuscleLibrary.All.First(m => m.Name == "Triceps"), 5 },
-                { MuscleLibrary.All.First(m => m.Name == "Shoulders"), 2 },
+                { "Upper Chest", 10 },
+                { "Lower Chest", 10 },
+                { "Triceps", 5 },
+                { "Shoulders", 3 },
             }
         },
 
         new Exercise {
-            Id = 2,
-            Name = "Squat",
-            MusclesWorked = new Dictionary<Muscle, int>
+            Name = "Incline Bench Press",
+            MusclesWorked = new Dictionary<string, int>
             {
-                { MuscleLibrary.All.First(m => m.Name == "Quads"), 9 },
-                { MuscleLibrary.All.First(m => m.Name == "Glutes"), 8 },
-                { MuscleLibrary.All.First(m => m.Name == "Hamstrings"), 6 },
-                { MuscleLibrary.All.First(m => m.Name == "Calves"), 3 },
-                { MuscleLibrary.All.First(m => m.Name == "Lower Back"), 3 },
+                { "Upper Chest", 10 },
+                { "Lower Chest", 3 },
+                { "Shoulders", 5 },
+                { "Triceps", 3 },
             }
         },
 
         new Exercise {
-            Id = 3,
-            Name = "Deadlift",
-            MusclesWorked = new Dictionary<Muscle, int>
+            Name = "Dumbbell Bench Press",
+            MusclesWorked = new Dictionary<string, int>
             {
-                { MuscleLibrary.All.First(m => m.Name == "Hamstrings"), 8 },
-                { MuscleLibrary.All.First(m => m.Name == "Glutes"), 7 },
-                { MuscleLibrary.All.First(m => m.Name == "Lower Back"), 9 },
-                { MuscleLibrary.All.First(m => m.Name == "Forearms"), 6 },
-                { MuscleLibrary.All.First(m => m.Name == "Traps"), 4 },
-                { MuscleLibrary.All.First(m => m.Name == "Quads"), 4 },
+                { "Upper Chest", 9 },
+                { "Lower Chest", 9 },
+                { "Triceps", 4 },
+                { "Shoulders", 2 },
             }
         },
 
         new Exercise {
-            Id = 4,
-            Name = "Overhead Press",
-            MusclesWorked = new Dictionary<Muscle, int>
+            Name = "Cable Fly",
+            MusclesWorked = new Dictionary<string, int>
             {
-                { MuscleLibrary.All.First(m => m.Name == "Shoulders"), 9 },
-                { MuscleLibrary.All.First(m => m.Name == "Triceps"), 7 },
-                { MuscleLibrary.All.First(m => m.Name == "Upper Chest"), 3 },
-                { MuscleLibrary.All.First(m => m.Name == "Traps"), 3 },
+                { "Upper Chest", 10 },
+                { "Lower Chest", 8 },
             }
         },
 
         new Exercise {
-            Id = 5,
+            Name = "Machine Fly",
+            MusclesWorked = new Dictionary<string, int>
+            {
+                { "Upper Chest", 10 },
+                { "Lower Chest", 8 },
+            }
+        },
+
+        new Exercise {
+            Name = "Push-ups",
+            MusclesWorked = new Dictionary<string, int>
+            {
+                { "Upper Chest", 9 },
+                { "Lower Chest", 9 },
+                { "Triceps", 6 },
+                { "Shoulders", 3 },
+            }
+        },
+
+        new Exercise {
+            Name = "Machine Chest Press",
+            MusclesWorked = new Dictionary<string, int>
+            {
+                { "Upper Chest", 10 },
+                { "Lower Chest", 9 },
+                { "Triceps", 3 },
+            }
+        },
+
+        // ========== BACK EXERCISES ==========
+        new Exercise {
             Name = "Barbell Row",
-            MusclesWorked = new Dictionary<Muscle, int>
+            MusclesWorked = new Dictionary<string, int>
             {
-                { MuscleLibrary.All.First(m => m.Name == "Upper Back"), 8 },
-                { MuscleLibrary.All.First(m => m.Name == "Lower Back"), 6 },
-                { MuscleLibrary.All.First(m => m.Name == "Biceps"), 5 },
-                { MuscleLibrary.All.First(m => m.Name == "Forearms"), 4 },
-                { MuscleLibrary.All.First(m => m.Name == "Traps"), 4 },
+                { "Upper Back", 10 },
+                { "Lower Back", 8 },
+                { "Biceps", 5 },
+                { "Traps", 3 },
+            }
+        },
+
+        new Exercise {
+            Name = "Pendlay Row",
+            MusclesWorked = new Dictionary<string, int>
+            {
+                { "Upper Back", 10 },
+                { "Lower Back", 7 },
+                { "Biceps", 4 },
+                { "Forearms", 2 },
+            }
+        },
+
+        new Exercise {
+            Name = "Lat Pulldown",
+            MusclesWorked = new Dictionary<string, int>
+            {
+                { "Upper Back", 10 },
+                { "Biceps", 5 },
+                { "Forearms", 2 },
+            }
+        },
+
+        new Exercise {
+            Name = "Pull-ups",
+            MusclesWorked = new Dictionary<string, int>
+            {
+                { "Upper Back", 9 },
+                { "Biceps", 9 },
+                { "Forearms", 3 },
+            }
+        },
+
+        new Exercise {
+            Name = "Single Arm Row",
+            MusclesWorked = new Dictionary<string, int>
+            {
+                { "Upper Back", 10 },
+                { "Lower Back", 7 },
+                { "Biceps", 4 },
+                { "Forearms", 2 },
+            }
+        },
+
+        new Exercise {
+            Name = "Face Pulls",
+            MusclesWorked = new Dictionary<string, int>
+            {
+                { "Shoulders", 9 },
+                { "Upper Back", 7 },
+                { "Traps", 5 },
+            }
+        },
+
+        new Exercise {
+            Name = "Cable Row",
+            MusclesWorked = new Dictionary<string, int>
+            {
+                { "Upper Back", 10 },
+                { "Lower Back", 7 },
+                { "Biceps", 4 },
+                { "Forearms", 3 },
+            }
+        },
+
+        new Exercise {
+            Name = "High Row",
+            MusclesWorked = new Dictionary<string, int>
+            {
+                { "Upper Back", 10 },
+                { "Shoulders", 5 },
+                { "Biceps", 4 },
+                { "Traps", 3 },
+            }
+        },
+
+        new Exercise {
+            Name = "Machine Row",
+            MusclesWorked = new Dictionary<string, int>
+            {
+                { "Upper Back", 10 },
+                { "Lower Back", 4 },
+                { "Biceps", 3 },
+            }
+        },
+
+        new Exercise {
+            Name = "T-Bar Row",
+            MusclesWorked = new Dictionary<string, int>
+            {
+                { "Upper Back", 10 },
+                { "Lower Back", 6 },
+                { "Biceps", 5 },
+                { "Traps", 3 },
+            }
+        },
+
+        // ========== LEG EXERCISES ==========
+        new Exercise {
+            Name = "Squat",
+            MusclesWorked = new Dictionary<string, int>
+            {
+                { "Quads", 10 },
+                { "Glutes", 9 },
+                { "Hamstrings", 4 },
+                { "Lower Back", 3 },
+                { "Calves", 2 },
+            }
+        },
+
+        new Exercise {
+            Name = "Front Squat",
+            MusclesWorked = new Dictionary<string, int>
+            {
+                { "Quads", 10 },
+                { "Glutes", 6 },
+                { "Abs", 4 },
+                { "Upper Back", 2 },
+            }
+        },
+
+        new Exercise {
+            Name = "Leg Press",
+            MusclesWorked = new Dictionary<string, int>
+            {
+                { "Quads", 10 },
+                { "Glutes", 8 },
+                { "Hamstrings", 4 },
+                { "Calves", 2 },
+            }
+        },
+
+        new Exercise {
+            Name = "Leg Extension",
+            MusclesWorked = new Dictionary<string, int>
+            {
+                { "Quads", 10 },
+            }
+        },
+
+        new Exercise {
+            Name = "Hack Squat",
+            MusclesWorked = new Dictionary<string, int>
+            {
+                { "Quads", 10 },
+                { "Glutes", 7 },
+                { "Hamstrings", 3 },
+            }
+        },
+
+        new Exercise {
+            Name = "Walking Lunges",
+            MusclesWorked = new Dictionary<string, int>
+            {
+                { "Quads", 10 },
+                { "Glutes", 9 },
+                { "Hamstrings", 4 },
+                { "Calves", 2 },
+            }
+        },
+
+        new Exercise {
+            Name = "Deadlift",
+            MusclesWorked = new Dictionary<string, int>
+            {
+                { "Hamstrings", 10 },
+                { "Glutes", 9 },
+                { "Lower Back", 8 },
+                { "Traps", 4 },
+                { "Forearms", 3 },
+            }
+        },
+
+        new Exercise {
+            Name = "Romanian Deadlift",
+            MusclesWorked = new Dictionary<string, int>
+            {
+                { "Hamstrings", 10 },
+                { "Lower Back", 8 },
+                { "Glutes", 7 },
+                { "Forearms", 2 },
+            }
+        },
+
+        new Exercise {
+            Name = "Leg Curl",
+            MusclesWorked = new Dictionary<string, int>
+            {
+                { "Hamstrings", 10 },
+                { "Glutes", 2 },
+            }
+        },
+
+        new Exercise {
+            Name = "Calf Raises",
+            MusclesWorked = new Dictionary<string, int>
+            {
+                { "Calves", 10 },
+            }
+        },
+
+        // ========== ARM EXERCISES ==========
+        new Exercise {
+            Name = "Barbell Curl",
+            MusclesWorked = new Dictionary<string, int>
+            {
+                { "Biceps", 10 },
+                { "Forearms", 4 },
+            }
+        },
+
+        new Exercise {
+            Name = "Dumbbell Curl",
+            MusclesWorked = new Dictionary<string, int>
+            {
+                { "Biceps", 10 },
+                { "Forearms", 3 },
+            }
+        },
+
+        new Exercise {
+            Name = "Hammer Curl",
+            MusclesWorked = new Dictionary<string, int>
+            {
+                { "Biceps", 9 },
+                { "Forearms", 5 },
+            }
+        },
+
+        new Exercise {
+            Name = "Barbell Preacher Curl",
+            MusclesWorked = new Dictionary<string, int>
+            {
+                { "Biceps", 10 },
+                { "Forearms", 3 },
+            }
+        },
+
+        new Exercise {
+            Name = "Machine Preacher Curl",
+            MusclesWorked = new Dictionary<string, int>
+            {
+                { "Biceps", 10 },
+                { "Forearms", 2 },
+            }
+        },
+
+        new Exercise {
+            Name = "Tricep Pushdown",
+            MusclesWorked = new Dictionary<string, int>
+            {
+                { "Triceps", 10 },
+            }
+        },
+
+        new Exercise {
+            Name = "Skull Crushers",
+            MusclesWorked = new Dictionary<string, int>
+            {
+                { "Triceps", 10 },
+                { "Upper Chest", 3 },
+                { "Shoulders", 2 },
+            }
+        },
+
+        new Exercise {
+            Name = "Close Grip Bench Press",
+            MusclesWorked = new Dictionary<string, int>
+            {
+                { "Triceps", 10 },
+                { "Upper Chest", 7 },
+                { "Lower Chest", 3 },
+            }
+        },
+
+        new Exercise {
+            Name = "Assisted Dips",
+            MusclesWorked = new Dictionary<string, int>
+            {
+                { "Triceps", 9 },
+                { "Lower Chest", 8 },
+                { "Shoulders", 4 },
+            }
+        },
+
+        // ========== SHOULDER EXERCISES ==========
+        new Exercise {
+            Name = "Overhead Press",
+            MusclesWorked = new Dictionary<string, int>
+            {
+                { "Shoulders", 10 },
+                { "Triceps", 6 },
+                { "Upper Chest", 4 },
+                { "Traps", 3 },
+            }
+        },
+
+        new Exercise {
+            Name = "Dumbbell Shoulder Press",
+            MusclesWorked = new Dictionary<string, int>
+            {
+                { "Shoulders", 10 },
+                { "Triceps", 5 },
+                { "Upper Back", 2 },
+            }
+        },
+
+        new Exercise {
+            Name = "Lateral Raise",
+            MusclesWorked = new Dictionary<string, int>
+            {
+                { "Shoulders", 10 },
+                { "Traps", 2 },
+            }
+        },
+
+        new Exercise {
+            Name = "Reverse Pec Deck",
+            MusclesWorked = new Dictionary<string, int>
+            {
+                { "Shoulders", 9 },
+                { "Upper Back", 6 },
+                { "Traps", 2 },
+            }
+        },
+
+        new Exercise {
+            Name = "Shrugs",
+            MusclesWorked = new Dictionary<string, int>
+            {
+                { "Traps", 10 },
+                { "Upper Back", 3 },
+            }
+        },
+
+        // ========== CORE EXERCISES ==========
+        new Exercise {
+            Name = "Crunches",
+            MusclesWorked = new Dictionary<string, int>
+            {
+                { "Abs", 10 },
+            }
+        },
+
+        new Exercise {
+            Name = "Hanging Leg Raises",
+            MusclesWorked = new Dictionary<string, int>
+            {
+                { "Abs", 10 },
+                { "Forearms", 3 },
+            }
+        },
+
+        new Exercise {
+            Name = "Planks",
+            MusclesWorked = new Dictionary<string, int>
+            {
+                { "Abs", 9 },
+                { "Lower Back", 8 },
+                { "Shoulders", 2 },
+            }
+        },
+
+        new Exercise {
+            Name = "Cable Woodchops",
+            MusclesWorked = new Dictionary<string, int>
+            {
+                { "Abs", 9 },
             }
         }
     };

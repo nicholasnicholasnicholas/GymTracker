@@ -31,6 +31,30 @@
     <script src="https://cdn.jsdelivr.net/npm/cropperjs@1.5.13/dist/cropper.min.js"></script>
     <script src="js/cropperInterop.js"></script>
 
+    <!-- window scaling shit -->
+    <script>
+        window.getScrollHeight = function (el) {
+            return el.scrollHeight;
+        };
+
+        window.setMaxHeight = function (el, height) {
+            el.style.maxHeight = height + "px";
+        };
+        
+        // Helpers that accept element id strings (useful when ElementReference capture is inconvenient)
+        window.getScrollHeightById = function (id) {
+            const el = document.getElementById(id);
+            return el ? el.scrollHeight : 0;
+        };
+
+        window.setMaxHeightById = function (id, height) {
+            const el = document.getElementById(id);
+            if (el) el.style.maxHeight = height + "px";
+        };
+
+        
+    </script>
+
     <script src="_framework/blazor.web.js"></script>
 </body>
 
