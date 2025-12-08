@@ -1,0 +1,117 @@
+@using System.Text.Json
+@using System.Reflection
+@using Microsoft.JSInterop
+@inject IJSRuntime JS
+
+@typeparam TMarker
+
+<div id="@MapId" style="height:@Height; width:@Width;"></div>
+
+@code {
+    [Parameter] public string? ApiKey { get; set; }
+    [Parameter] public double CenterLat { get; set; } = 33.8703;
+    [Parameter] public double CenterLng { get; set; } = -117.9243;
+    [Parameter] public int Zoom { get; set; } = 13;
+    [Parameter] public string Height { get; set; } = "400px";
+    [Parameter] public string Width { get; set; } = "100%";
+    [Parameter] public IEnumerable<TMarker>? Markers { get; set; }
+
+    private string MapId = "map-" + Guid.NewGuid().ToString("N");
+    private bool initialized = false;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            // Wait for googleMaps helper and Maps API
+            try
+            {
+                // Wait for the Google Maps API and our googleMaps helper to be available.
+                var ready = false;
+                for (int i = 0; i < 50; i++)
+                {
+                    try
+                    {
+                        ready = await JS.InvokeAsync<bool>("eval", "(typeof window.google !== 'undefined' && typeof window.google.maps !== 'undefined' && typeof window.googleMaps !== 'undefined')");
+                        if (ready) break;
+                    }
+                    catch
+                    {
+                        // ignore and retry
+                    }
+                    await Task.Delay(100);
+                }
+
+                if (!ready)
+                {
+                    await JS.InvokeVoidAsync("console.error", "GoogleMap: Google Maps API or googleMaps helper not available after waiting");
+                    return;
+                }
+
+                await JS.InvokeVoidAsync("googleMaps.initMap", MapId, CenterLat, CenterLng, Zoom);
+                initialized = true;
+                if (Markers != null)
+                {
+                    await RefreshMarkersAsync();
+                }
+            }
+            catch (JSException jsEx)
+            {
+                await JS.InvokeVoidAsync("console.error", "GoogleMap component init failed:", jsEx.Message);
+            }
+        }
+    }
+
+    public async Task RefreshMarkersAsync()
+    {
+        if (!initialized) return;
+        try
+        {
+            // Build a plain payload with predictable property names for the JS helper
+            var list = new List<Dictionary<string, object?>>();
+            foreach (var item in (Markers ?? Enumerable.Empty<TMarker>()))
+            {
+                if (item == null) continue;
+                var dict = new Dictionary<string, object?>();
+                var t = item.GetType();
+                foreach (var p in t.GetProperties(BindingFlags.Public | BindingFlags.Instance))
+                {
+                    var name = p.Name;
+                    var val = p.GetValue(item);
+                    // normalize common names
+                    if (string.Equals(name, "Latitude", StringComparison.OrdinalIgnoreCase)) name = "latitude";
+                    else if (string.Equals(name, "Longitude", StringComparison.OrdinalIgnoreCase)) name = "longitude";
+                    else { /* keep original casing for other props */ }
+                    dict[name] = val;
+                }
+                // ensure numeric latitude/longitude keys exist even if properties named lat/lng
+                if (!dict.ContainsKey("latitude"))
+                {
+                    var latProp = t.GetProperty("lat", BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
+                    if (latProp != null) dict["latitude"] = latProp.GetValue(item);
+                }
+                if (!dict.ContainsKey("longitude"))
+                {
+                    var lngProp = t.GetProperty("lng", BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
+                    if (lngProp != null) dict["longitude"] = lngProp.GetValue(item);
+                }
+                list.Add(dict);
+            }
+
+            await JS.InvokeVoidAsync("console.debug", "GoogleMap.RefreshMarkersAsync calling addMarkers with count:", list.Count);
+            await JS.InvokeVoidAsync("googleMaps.addMarkers", list);
+        }
+        catch (JSException jsEx)
+        {
+            await JS.InvokeVoidAsync("console.error", "GoogleMap.RefreshMarkersAsync failed:", jsEx.Message);
+        }
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (initialized)
+        {
+            await RefreshMarkersAsync();
+        }
+    }
+}
