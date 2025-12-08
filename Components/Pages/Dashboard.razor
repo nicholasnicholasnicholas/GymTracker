@@ -1,16 +1,92 @@
 ﻿@page "/"
+@inject NavigationManager NavManager
 
 <PageTitle>Dashboard</PageTitle>
 
-<h1>Welcome to GymTracker!</h1>
+<div class="dashboard-root">
 
+    <!-- ================= HERO SECTION ================= -->
 
-<p>This site helps you keep track of your fitness journey. Here's what you can do:</p>
+    <section class="dashboard-hero">
+        <div class="hero-text">
+            <p class="hero-eyebrow">Welcome back</p>
+            <h1>Welcome to GymTracker!</h1>
+            <p class="hero-subtitle">
+                Keep track of your workouts, follow your plan, and discover events and gyms.
+            </p>
 
-<ul>
-    <li>Log your daily workouts</li>
-    <li>Track progress over time</li>
-    <li>Plan future workouts</li>
-    <li>View your personal statistics</li>
-</ul>
+            <div class="hero-actions">
+                <a href="/logworkout" class="btn btn-primary">Log a workout</a>
+            </div>
+
+            <!-- Focus section -->
+            <div class="hero-focus-grid">
+                <div class="hero-focus-card">
+                    <h5>Build consistency:</h5>
+                    <p>Turning small daily workouts into long-term habits is what creates real change.</p>
+                </div>
+
+                <div class="hero-focus-card">
+                    <h5>Train with purpose:</h5>
+                    <p>Follow your workout plan to help guide you to your goals.</p>
+                </div>
+
+                <div class="hero-focus-card">
+                    <h5>Stay inspired:</h5>
+                    <p>Discover races, gym events, and challenges to stay motivated.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= GETTING STARTED PANEL ================= -->
+
+        <div class="hero-panel">
+            <h3>Getting started</h3>
+            <p class="hero-panel-subtitle">
+                A checklist to use GymTracker:
+            </p>
+
+            <ul class="hero-panel-list">
+                <li>Log your first workout in <strong>Journal</strong>.</li>
+                <li>Create a weekly routine in <strong>Workout Plan</strong>.</li>
+                <li>Browse <strong>News &amp; Events</strong> for an upcoming race or class.</li>
+            </ul>
+
+            <p class="hero-panel-tip">
+                <strong>Tip:</strong> Create a user profile to save your data and access it from any device.
+            </p>
+        </div>
+    </section>
+
+    <!-- ================= DASHBOARD TILES ================= -->
+
+    <section class="dashboard-tiles">
+
+        <div class="dash-tile">
+            <h4>Journal</h4>
+            <p>Log your workout date, time elapsed, amount of reps, sets and view your overall summary.</p>
+            <a href="/logworkout" class="tile-link">Open journal →</a>
+        </div>
+
+        <div class="dash-tile">
+            <h4>Workout Plan</h4>
+            <p>Use a preset workout plan or update the training plan you’re following this week.</p>
+            <a href="/workout-plan" class="tile-link">Go to workout plan →</a>
+        </div>
+
+        <div class="dash-tile">
+            <h4>News &amp; Events</h4>
+            <p>Stay updated with local races, gym events, and fitness challenges.</p>
+            <a href="/newsevents" class="tile-link">Browse events →</a>
+        </div>
+
+        <div class="dash-tile">
+            <h4>Map</h4>
+            <p>Find nearby gyms around your location.</p>
+            <a href="/nearest-gym" class="tile-link">Find a gym →</a>
+        </div>
+
+    </section>
+
+</div>
 
