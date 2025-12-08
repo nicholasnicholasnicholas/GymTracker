@@ -19,15 +19,9 @@ builder.Services.AddScoped<UserSessionService>();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddAuthorizationCore();
 
-<<<<<<< HEAD
-// ✅ Ensure database uses correct absolute path
-var dbPath = Path.Combine(Directory.GetCurrentDirectory(), "GymTracker.db");
-Console.WriteLine($"💾 Using DB at: {dbPath}");
-=======
 // Configure SQLite DB
 var dbPath = Path.Combine(Directory.GetCurrentDirectory(), "GymTracker.db");
 Console.WriteLine($"Using DB at: {dbPath}");
->>>>>>> 0fa0dd2b285130b473c32ccd67831a5cf3e7fc39
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlite($"Data Source={dbPath}"));
